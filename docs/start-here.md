@@ -12,6 +12,7 @@ The four setup skills live in `.agents/skills/`, so they stay with each new game
 | Prepare a secure VPS and deploy Nakama | [Production interview](../.agents/skills/mobile-production-setup/SKILL.md) |
 | Build/install Android | [Android export interview](../.agents/skills/mobile-android-export/SKILL.md) |
 | Build/run iOS in Xcode | [iOS export interview](../.agents/skills/mobile-ios-export/SKILL.md) |
+| Choose native Nakama features for your game | [Feature-planning skill](../.agents/skills/nakama-feature-planning/SKILL.md) and [concept map](nakama-feature-map.md) |
 | Turn an idea into a prototype | [Game prompt](new-game-prompt.md), after local setup works |
 
 The assistant asks a few questions at a time, checks what is installed, and saves progress without secrets under ignored `.setup/`. Say "resume local setup" or "resume the Android interview" to continue. Keep private keys, passwords, account tokens, and keystores out of chat. The assistant will help you set them on your machine.

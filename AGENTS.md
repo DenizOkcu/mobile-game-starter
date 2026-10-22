@@ -16,8 +16,15 @@ Interview a few questions at a time, reuse existing answers, verify prerequisite
 
 For every new visible game-art or UI-art task, read and invoke the available **imagegen** skill and follow `docs/setup/visual-assets.md`. Generate actual characters/objects/backgrounds, UI skins, icons and splash artwork; do not substitute primitive shapes, procedural drawing, emoji or default-widget-only visuals for the game's art direction. Native layout/controls, readable live text, collision shapes and hit regions remain code. Explicit user requests for geometric/vector/wireframe output override this rule. If imagegen is unavailable, continue non-art work and report the asset milestone blocked; do not silently draw a substitute. Copy selected assets into the repo before referencing them.
 
+## Prefer native Nakama features
+
+Before designing a backend feature, read `docs/nakama-feature-map.md` and use `.agents/skills/nakama-feature-planning/SKILL.md`. Interpret behavior, not just the developer's label: a durable fellowship/guild/coven is usually a Nakama Group; a temporary expedition crew may be a Party; an NPC roster is game state. Ask only about ambiguities that affect the design.
+
+Map the request to native capabilities before adding custom tables, services or RPCs. Reuse the official SDK and native permissions/IDs; add only the game's policy and state. Keep one authoritative membership/balance/score source and guard all native entry paths when imposing custom rules. Verify API support in the pinned server, SDK and runtime types. Do not implement every capability just because it appears in the guide.
+
 ## Read first
 - `README.md` for commands and scope.
+- `docs/nakama-feature-map.md` before planning backend/social/economy/multiplayer features.
 - `docs/architecture.md` before changing player state or RPCs.
 - `docs/mobile.md` before exporting.
 - `docs/deployment.md` before deploying.

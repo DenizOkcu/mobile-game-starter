@@ -46,6 +46,8 @@ For help with mobile exports, use the [Android](.agents/skills/mobile-android-ex
 
 ## Add a game idea
 
+Before designing backend features, the assistant follows the [Nakama feature map](docs/nakama-feature-map.md) and [feature-planning skill](.agents/skills/nakama-feature-planning/SKILL.md). It maps behavior rather than names: a persistent clan, guild or fellowship reuses Groups, while temporary teams may use Parties. Only game-specific rules are added.
+
 Give your coding assistant [AGENTS.md](AGENTS.md) and your idea using [the starter prompt](docs/new-game-prompt.md). Build your loop in `client/game/game.tscn` and `game.gd`, keeping the accounts and menus. Add a specific server action to `server/src/main.ts` when gameplay needs saved state. The included `complete_tutorial` action shows one state change; it is not a general API for submitting scores or claiming rewards.
 
 The official Godot SDK 3.4.0 is vendored under `addons/com.heroiclabs.nakama/` with its license; see [dependency provenance](docs/dependencies.md). The npm lockfile pins the compiler and official runtime types. Nothing is installed on the VPS beyond the compiled module and existing Docker stack.

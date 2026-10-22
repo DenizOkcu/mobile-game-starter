@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nakama feature planning"
+  short_description: "Map game concepts to native Nakama capabilities"
+  default_prompt: "Use $nakama-feature-planning to map my game requirements to native Nakama features and identify only the custom rules needed."

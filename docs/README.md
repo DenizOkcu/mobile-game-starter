@@ -28,6 +28,7 @@ We maintain the HTML by hand. When behavior changes, update the matching section
 | Guided setup | `start-here.md`, `../.agents/skills/` |
 | Add your game idea | `new-game-prompt.md`, `../AGENTS.md` |
 | Command reference | `../tools/manage.mjs` |
+| Native Nakama feature selection | `nakama-feature-map.md`, `../.agents/skills/nakama-feature-planning/` |
 | Accounts and state | `architecture.md`, `../client/core/backend.gd`, `../server/src/main.ts` |
 | Android and iOS | `mobile.md`, `../tools/export.mjs`, `../tools/export_presets.template` |
 | Backend deployment | `deployment.md`, `../tools/manage.mjs` |

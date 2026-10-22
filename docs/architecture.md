@@ -47,11 +47,11 @@ Nakama's server key is a public client identifier. Keep session and refresh sign
 
 ## Adding a feature
 
-1. Implement the smallest playable local interaction in `client/game`.
-2. Define an intent with bounded IDs/choices, not computed rewards.
-3. Add a validated TypeScript RPC using the existing load/save functions.
-4. Replace client state only with a successful canonical snapshot.
-5. Add a real API test, including invalid intent and duplicate/concurrent calls when money or progression changes.
+1. Read the [Nakama feature map](nakama-feature-map.md) and map the requested behavior to a native capability, even when the game uses different names.
+2. Implement the smallest playable interaction in `client/game`, reusing the official SDK for native features. A native list, join or read operation does not automatically need a new RPC.
+3. Add a TypeScript hook/RPC only for the game's extra rules or custom state transitions. Validate intent, keep one authoritative source, and cover native mutation paths that could bypass a wrapper-only rule.
+4. Reconcile canonical state after writes. Use narrow UI adapters for social/multiplayer results rather than cloning Nakama's services into the player snapshot.
+5. Add real API tests for native permissions and custom policy, including invalid intent and duplicate/concurrent calls when rewards or progression change.
 
 The implementation follows the official [Nakama Docker Compose](https://heroiclabs.com/docs/nakama/getting-started/install/docker/), [TypeScript runtime](https://heroiclabs.com/docs/nakama/server-framework/typescript-runtime/), [REST API definition](https://github.com/heroiclabs/nakama/blob/master/apigrpc/apigrpc.swagger.json), and [Godot SDK](https://heroiclabs.com/docs/nakama/client-libraries/godot/) references. Image versions use configurable, explicit tags based on the working local Nakama 3.41 setup. Back up the database and run integration checks when upgrading.
 
