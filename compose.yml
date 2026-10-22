@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:?Run init}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nakama
+      POSTGRES_USER: nakama
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run init}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U nakama -d nakama']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  nakama:
+    image: ${NAKAMA_IMAGE:?Run init}
+    restart: unless-stopped
+    entrypoint: [/bin/sh, /etc/starter/start.sh]
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run init}
+      NAKAMA_SERVER_KEY: ${NAKAMA_SERVER_KEY:?Run init}
+      NAKAMA_SESSION_KEY: ${NAKAMA_SESSION_KEY:?Run init}
+      NAKAMA_REFRESH_KEY: ${NAKAMA_REFRESH_KEY:?Run init}
+      NAKAMA_RUNTIME_KEY: ${NAKAMA_RUNTIME_KEY:?Run init}
+      NAKAMA_CONSOLE_PASSWORD: ${NAKAMA_CONSOLE_PASSWORD:?Run init}
+      NAKAMA_CONSOLE_SIGNING_KEY: ${NAKAMA_CONSOLE_SIGNING_KEY:?Run init}
+      LOG_LEVEL: ${LOG_LEVEL:?Run init}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./server/modules:/nakama/data/modules:ro
+      - ./infra/start.sh:/etc/starter/start.sh:ro
+    ports:
+      - '${LOCAL_BIND_IP:?Run init}:${LOCAL_API_PORT:?Run init}:7350'
+      - '127.0.0.1:${LOCAL_CONSOLE_PORT:?Run init}:7351'
+    healthcheck:
+      test: [CMD, /nakama/nakama, healthcheck]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+volumes:
+  postgres_data:

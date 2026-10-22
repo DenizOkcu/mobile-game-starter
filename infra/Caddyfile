@@ -1,0 +1,7 @@
+{
+	email {$TLS_EMAIL}
+}
+{$API_DOMAIN} {
+	encode gzip
+	reverse_proxy nakama:7350
+}
