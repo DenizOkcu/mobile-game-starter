@@ -8,7 +8,7 @@ Paths below are relative to `/Users/deniz.okcu/development`. Existing projects w
 | --- | --- |
 | `games/solarpunk` / Eco Farm Quest | Most mature reference. Godot portrait mobile, Nakama TypeScript, email/guest/link/refresh flows, authoritative farming state, versioned storage and bootstrap, config ownership, local services and SSH deployment. Read project settings, AGENTS, authentication autoload, storage write/get-state services, server authority contract, Compose, env example and deploy script. Preserve authority, OCC, explicit auth and canonical reconciliation. Avoid copying the farming domain, many autoloads, shared ingress dependencies, fixed container names, hardcoded VPS/IP or duplicated client configuration. |
 | `games/flipfront` | Godot portrait card battler, authoritative Nakama, session store, account hub, local Compose and real API tests. Reinforces explicit account access and requiring bootstrap before hub/play. |
-| `games/fridge-panic` | Godot portrait kitchen roguelite, Nakama SDK and TypeScript, three principal auth/network autoloads, local Compose. Confirms reusable menu/auth/backend separation; remove SDK and build requirements for this smaller scaffold. |
+| `games/fridge-panic` | Godot portrait kitchen roguelite, Nakama SDK and TypeScript, three principal auth/network autoloads, local Compose. Confirms reusable menu/auth/backend separation; reuse the official SDK and a minimal TypeScript build in this scaffold. |
 | `games/blastball` | Godot portrait offline football/action prototype, Compatibility renderer, menu/settings, local progression and meaningful UI tests. Reuse touch sizing, explicit settings and testable navigation. Accounts, ads and purchases are deliberately absent there. |
 | `games/null-vein` | Godot portrait offline action RPG with touch input and Compatibility renderer. Useful mobile baseline without backend coupling. |
 | `games/slay` | Godot iPhone portrait ARPG; main-menu entry and GameData/SaveManager/World autoloads. Preserve a clear game entry point without importing its gameplay globals. |
@@ -26,6 +26,6 @@ Other entries such as gallery/design tooling, LiteRT-LM runtime sources, and gam
 
 - Godot 4.7.2 is installed and matches several current prototypes. Compatibility rendering keeps the empty foundation broadly portable.
 - Nakama 3.41.0 follows Solarpunk's locally available image. PostgreSQL 17 has a straightforward stable volume layout for a new database. Versions are explicit env values rather than moving `latest` tags.
-- Lua is an intentional simplification from the mature TypeScript servers: this starter has only three small RPCs, so a transpiler, bundler, npm lockfile and copied SDK would add more setup than value. Larger game backends can adopt TypeScript when needed.
+- Following the requested stack, use the official Nakama Godot SDK and strict TypeScript runtime, as in the mature reference projects. A direct ES5 `tsc` build and lockfile keep this setup small without adding a bundler.
 - One env source generates public client config. Secrets stay in backend runtime environment. Separate local/production env files prevent accidental endpoint changes from being hardcoded in GDScript.
 - Standalone Caddy supplies ordinary automatic HTTPS on a clean VPS, without requiring Solarpunk's existing shared Caddy/Cloudflare networks and certificates.

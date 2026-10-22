@@ -1,12 +1,12 @@
 # Godot + Nakama mobile starter
 
-A small starting point for mobile prototypes and LLM-assisted development. Godot 4.7.2, typed GDScript, Nakama Lua, PostgreSQL, Docker Compose, and a stdlib-only Python command runner. No client SDK, npm build, or external Godot addons.
+A small starting point for mobile prototypes and LLM-assisted development. Godot 4.7.2, typed GDScript, Nakama TypeScript, PostgreSQL, Docker Compose, and a stdlib-only Python command runner. Uses the pinned official Nakama Godot SDK. The backend compiles with TypeScript directly, without a bundler.
 
 Includes explicit guest access, email registration/login, guest-to-email linking, refresh-token restore, logout, account deletion, a main menu, account/profile screen, persistent volume/haptics/reduced-motion settings, and a replaceable game scene. A server-owned player record and once-only tutorial reward demonstrate the complete client → intent → database → canonical snapshot loop.
 
 ## Start locally
 
-Prerequisites: Godot 4.7.2, Python 3.9+, Docker with Compose v2 supporting `up --wait`.
+Prerequisites: Godot 4.7.2, Node.js 22+ with npm, Python 3.9+, Docker with Compose v2 supporting `up --wait`.
 
 ```sh
 python3 tools/manage.py init
@@ -20,12 +20,13 @@ Open `project.godot` in Godot and press F5. Click **Play as guest**, then **Play
 | Command | Purpose |
 | --- | --- |
 | `python3 tools/manage.py configure` | Regenerate public client JSON, title and export presets after env changes |
-| `python3 tools/manage.py up` | Configure and start local PostgreSQL/Nakama; wait for health |
+| `python3 tools/manage.py build` | Install locked npm dependencies, type-check and compile TypeScript |
+| `python3 tools/manage.py up` | Build backend, configure client and start/reload PostgreSQL/Nakama; wait for health |
 | `python3 tools/manage.py down` | Stop services; keep player data |
 | `python3 tools/manage.py logs` | Follow recent service logs |
 | `python3 tools/manage.py status` | Show services |
-| `python3 tools/manage.py check` | Tool tests, both Compose configs, Godot import/navigation |
-| `python3 tools/manage.py smoke` | Real API and Godot HTTP tests; temporary accounts are deleted |
+| `python3 tools/manage.py check` | TypeScript build, tool tests, both Compose configs, Godot import/navigation |
+| `python3 tools/manage.py smoke` | Real API and official Godot SDK tests; temporary accounts are deleted |
 | `python3 tools/manage.py backup` | Write local PostgreSQL dump under ignored `backups/` |
 | `python3 tools/manage.py --env-file .env.production deploy` | Validate and deploy backend over SSH |
 
@@ -35,7 +36,9 @@ For a physical Android device, set `LOCAL_BIND_IP=0.0.0.0` and `CLIENT_API_URL=h
 
 ## Add a game idea
 
-Give an LLM [AGENTS.md](AGENTS.md) and your idea using [the starter prompt](docs/new-game-prompt.md). Replace `client/game/game.tscn` and `game.gd`; retain the account/menu infrastructure. Add narrow server intents to `server/modules/main.lua` only when gameplay needs persistence. `complete_tutorial` is an example transition, not a reusable reward/score submission API.
+Give an LLM [AGENTS.md](AGENTS.md) and your idea using [the starter prompt](docs/new-game-prompt.md). Replace `client/game/game.tscn` and `game.gd`; retain the account/menu infrastructure. Add narrow server intents to `server/src/main.ts` only when gameplay needs persistence. `complete_tutorial` is an example transition, not a reusable reward/score submission API.
+
+The official Godot SDK 3.4.0 is vendored under `addons/com.heroiclabs.nakama/` with its license; see [dependency provenance](docs/dependencies.md). The npm lockfile pins the compiler and official runtime types. Nothing is installed on the VPS beyond the compiled module and existing Docker stack.
 
 Read [architecture and RPC contracts](docs/architecture.md), [deployment](docs/deployment.md), and the [project survey](docs/project-survey.md).
 

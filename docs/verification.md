@@ -4,12 +4,13 @@ Completed on macOS with Godot 4.7.2 and the real Nakama 3.41.0 / PostgreSQL 17 D
 
 - Environment parser/generation tests: random independent secrets, private permissions, overwrite refusal, production origin/bind validation, duplicate/shell-expression rejection.
 - Local and production Compose configurations render successfully; the pinned Caddy container validates its configuration.
-- Local PostgreSQL backup command writes a private SQL dump.
+- Local PostgreSQL backup command writes a private SQL dump. These infrastructure checks remain valid after switching the runtime to TypeScript.
 - Android resource-pack export succeeds and includes public client config while excluding env, server, tools and tests. This is a resource-pack check, not an APK build.
+- Strict TypeScript type-check and ES5 compilation pass.
 - Godot headless import and auth/menu/settings/game navigation pass without script errors.
 - Rendered desktop login and settings screens inspected at the 360×640 window size.
 - Real REST checks: guest auth, lazy player initialization, validated profile, rejection of arrays/extra intent fields, unauthenticated denial, distinct player isolation, private storage-write denial, eight concurrent tutorial requests, once-only reward, guest email linking, existing-account login, refresh and logout revocation, temporary account deletion.
-- Actual Godot HTTP transport: email creation/bootstrap, RPC encoding/decoding, canonical reward, duplicate completion, persisted refresh-token restore, and account deletion. The test restores any pre-existing starter session file afterward.
+- Actual official Godot SDK transport: email creation/bootstrap, RPC encoding/decoding, canonical reward, duplicate completion, persisted refresh-token restore, guest SDK authentication, email linking preserving user ID, logout/login, and account deletion. The test restores any pre-existing starter session file afterward.
 
 The local backend is running with Compose project name `mobile-starter`. Stop it with `python3 tools/manage.py down`; this preserves data.
 

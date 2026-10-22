@@ -11,6 +11,10 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
+	var backend := root.get_node("Backend")
+	check(backend._client != null, "Official Nakama SDK client initialized")
+	check(not backend._client.auto_retry, "SDK cannot replay uncertain mutations")
+	check(not backend._client.auto_refresh, "Wrapper persists refreshed sessions")
 	var main: Control = load("res://client/ui/main.tscn").instantiate()
 	root.add_child(main)
 	await process_frame

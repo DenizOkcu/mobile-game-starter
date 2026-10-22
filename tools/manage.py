@@ -119,6 +119,12 @@ def configure(env):
     print('Configured client and mobile export presets (public values only).')
 
 
+def build_server():
+    run(["npm", "--prefix", ROOT / "server", "ci", "--ignore-scripts"])
+    run(["npm", "--prefix", ROOT / "server", "run", "type-check"])
+    run(["npm", "--prefix", ROOT / "server", "run", "build"])
+
+
 def godot_check(env):
     executable = env['GODOT_BIN']
     if not shutil.which(executable):
@@ -133,6 +139,7 @@ def godot_check(env):
 
 def deploy(env, env_file):
     validate(env, production=True)
+    build_server()
     configure(env)
     compose(env_file, 'config', '--quiet', production=True)
     godot_check(env)
@@ -156,6 +163,7 @@ umask 077
 if [ -f .env ]; then cp .env .env.previous; fi
 tar -xzf backend.tar.gz
 rm backend.tar.gz
+rm -f server/modules/main.lua
 chmod 600 .env
 docker compose --env-file .env -f compose.yml -f compose.production.yml pull
 docker compose --env-file .env -f compose.yml -f compose.production.yml up -d --wait --force-recreate
@@ -168,7 +176,7 @@ docker compose --env-file .env -f compose.yml -f compose.production.yml ps
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--env-file', default='.env', help='Relative to repo or absolute')
-    parser.add_argument('command', choices=['init', 'configure', 'up', 'down', 'logs', 'status', 'check', 'smoke', 'deploy', 'backup'])
+    parser.add_argument('command', choices=['init', 'configure', 'build', 'up', 'down', 'logs', 'status', 'check', 'smoke', 'deploy', 'backup'])
     args = parser.parse_args()
     path = (ROOT / args.env_file).resolve()
     if args.command == 'init':
@@ -181,12 +189,16 @@ def main():
     validate(env)
     if args.command == 'configure':
         configure(env)
+    elif args.command == 'build':
+        build_server()
     elif args.command == 'up':
+        build_server()
         configure(env)
-        compose(path, 'up', '-d', '--wait')
+        compose(path, 'up', '-d', '--wait', '--force-recreate', 'nakama')
     elif args.command in ('down', 'logs', 'status'):
         compose(path, *{'down': ['down'], 'logs': ['logs', '-f', '--tail', '100'], 'status': ['ps']}[args.command])
     elif args.command == 'check':
+        build_server()
         configure(env)
         run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_*.py'])
         compose(path, 'config', '--quiet')

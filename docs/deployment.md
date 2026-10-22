@@ -19,7 +19,7 @@ The VPS needs Docker Engine and Compose v2 (`up --wait`), SSH access, tar, and f
    python3 tools/manage.py --env-file .env.production deploy
    ```
 
-The runner validates production settings, generates the matching public game config, validates Compose and Godot, uploads only backend code/config over SCP, keeps `.env.previous`, pulls pinned images, migrates the database, and waits for healthy PostgreSQL/Nakama. Caddy obtains and renews TLS. The script does not upload the Godot game, source `.env`, erase volumes, install Docker, or change a firewall. Environment files are copied as private data and parsed by Compose.
+The runner validates production settings, installs the locked npm dependencies and compiles TypeScript locally, generates the matching public game config, validates Compose and Godot, uploads only the compiled JavaScript backend/config over SCP, keeps `.env.previous`, pulls pinned images, migrates the database, and waits for healthy PostgreSQL/Nakama. Caddy obtains and renews TLS. The VPS needs no Node/npm installation. The script removes the legacy starter Lua module when upgrading to the JavaScript runtime, preserving PostgreSQL data. The script does not upload the Godot game, source `.env`, erase volumes, install Docker, or change a firewall. Environment files are copied as private data and parsed by Compose.
 
 Check `https://YOUR_DOMAIN/healthcheck` externally after deployment; DNS and certificate issuance can take time. The Docker health checks establish backend readiness, not public TLS availability. Run the exported Godot app against production before distributing it. `deploy` leaves the generated client config pointed at production for the next export; run local `configure` to switch back.
 

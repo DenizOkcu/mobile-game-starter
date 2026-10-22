@@ -27,6 +27,18 @@ func _run() -> void:
 		check(backend.state.get("coins") == 10, "Reward granted once")
 		check(await backend.restore(), "Refresh token persistence and restore")
 		check(await backend.delete_account(), "Account deletion")
+	# Exercise device auth without touching the installation identity file.
+	var guest: NakamaSession = await backend._client.authenticate_device_async(unique)
+	check(backend._accept(guest), "Official SDK guest auth")
+	if not backend.token.is_empty():
+		check(await backend.refresh_state(), "Guest bootstrap")
+		var guest_id: String = backend._session.user_id
+		check(await backend.link_email("linked-" + unique + "@example.com", unique), "SDK email linking")
+		await backend.logout()
+		check(backend.token.is_empty() and backend.state.is_empty(), "SDK logout clears account state")
+		check(await backend.authenticate("linked-" + unique + "@example.com", unique, false), "SDK linked email login")
+		check(backend._session.user_id == guest_id, "Linking preserves player identity")
+		check(await backend.delete_account(), "Guest account cleanup")
 	if existed:
 		var file := FileAccess.open(path, FileAccess.WRITE)
 		file.store_buffer(previous)
