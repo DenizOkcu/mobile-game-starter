@@ -8,7 +8,7 @@ guide navigation highlighting, and an explicitly illustrative browser demo.
 Preview from the repository root:
 
 ```sh
-python3 -m http.server 8080 --bind 127.0.0.1 --directory docs
+node tools/serve-docs.mjs
 ```
 
 Open `http://127.0.0.1:8080`. Opening `index.html` directly also works; if the
@@ -27,10 +27,10 @@ The HTML is hand-maintained. Update the relevant section alongside source change
 | Overview and quickstart | `README.md`, `client/game/game.gd` |
 | Guided setup | `start-here.md`, `../.agents/skills/` |
 | Add your game idea | `new-game-prompt.md`, `../AGENTS.md` |
-| Command reference | `../tools/manage.py` |
+| Command reference | `../tools/manage.mjs` |
 | Accounts and state | `architecture.md`, `../client/core/backend.gd`, `../server/src/main.ts` |
-| Android and iOS | `mobile.md`, `../tools/export.py`, `../tools/export_presets.template` |
-| Backend deployment | `deployment.md`, `../tools/manage.py` |
+| Android and iOS | `mobile.md`, `../tools/export.mjs`, `../tools/export_presets.template` |
+| Backend deployment | `deployment.md`, `../tools/manage.mjs` |
 | Shipping and scope | `README.md`, `verification.md`, `mobile.md` |
 
 The project name is engine-independent. Document the current Godot implementation

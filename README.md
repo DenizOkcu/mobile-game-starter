@@ -2,7 +2,7 @@
 
 Explore the [website and documentation](docs/index.html) for an overview, quickstart, and guides to building, exporting, and deploying your game. See [docs/README.md](docs/README.md) for local website preview instructions.
 
-Mobile Game Starter is a small starting point for mobile prototypes and LLM-assisted development. Godot 4.7.2, typed GDScript, Nakama TypeScript, PostgreSQL, Docker Compose, and a stdlib-only Python command runner. Uses the pinned official Nakama Godot SDK. The backend compiles with TypeScript directly, without a bundler.
+Mobile Game Starter is a small starting point for mobile prototypes and LLM-assisted development. Godot 4.7.2, typed GDScript, Nakama TypeScript, PostgreSQL and Docker Compose, with dependency-free Node.js tooling and a Bash deployment script. Uses the pinned official Nakama Godot SDK. The backend compiles with TypeScript directly, without a bundler.
 
 Includes explicit guest access, email registration/login, guest-to-email linking, refresh-token restore, logout, account deletion, a main menu, account/profile screen, persistent volume/haptics/reduced-motion settings, and a replaceable game scene. A server-owned player record and once-only tutorial reward demonstrate the complete client → intent → database → canonical snapshot loop.
 
@@ -14,11 +14,11 @@ The [visual asset policy](docs/setup/visual-assets.md) requires the imagegen ski
 
 ## Start locally
 
-Prerequisites: Godot 4.7.2, Node.js 22+ with npm, Python 3.9+, Docker with Compose v2 supporting `up --wait`.
+Prerequisites: Godot 4.7.2, Node.js 22+ with npm, Bash, Docker with Compose v2 supporting `up --wait`, and OpenSSH/tar for VPS deployment. On Windows, use a consistent WSL2 setup or a verified Git Bash toolchain.
 
 ```sh
-python3 tools/manage.py init
-python3 tools/manage.py up
+node tools/manage.mjs init
+node tools/manage.mjs up
 ```
 
 Open `project.godot` in Godot and press F5. Click **Play as guest**, then **Play**, then activate the beacon. The server grants 10 coins once. Restart the game to restore the same player. Link an email under Account to use the same progress on another installation.
@@ -27,22 +27,22 @@ Open `project.godot` in Godot and press F5. Click **Play as guest**, then **Play
 
 | Command | Purpose |
 | --- | --- |
-| `python3 tools/manage.py configure` | Regenerate public client JSON, title and export presets after env changes |
-| `python3 tools/manage.py build` | Install locked npm dependencies, type-check and compile TypeScript |
-| `python3 tools/manage.py up` | Build backend, configure client and start/reload PostgreSQL/Nakama; wait for health |
-| `python3 tools/manage.py down` | Stop services; keep player data |
-| `python3 tools/manage.py logs` | Follow recent service logs |
-| `python3 tools/manage.py status` | Show services |
-| `python3 tools/manage.py check` | TypeScript build, tool tests, both Compose configs, Godot import/navigation |
-| `python3 tools/manage.py smoke` | Real API and official Godot SDK tests; temporary accounts are deleted |
-| `python3 tools/manage.py backup` | Write local PostgreSQL dump under ignored `backups/` |
-| `python3 tools/manage.py --env-file .env.production deploy` | Validate and deploy backend over SSH |
+| `node tools/manage.mjs configure` | Regenerate public client JSON, title and export presets after env changes |
+| `node tools/manage.mjs build` | Install locked npm dependencies, type-check and compile TypeScript |
+| `node tools/manage.mjs up` | Build backend, configure client and start/reload PostgreSQL/Nakama; wait for health |
+| `node tools/manage.mjs down` | Stop services; keep player data |
+| `node tools/manage.mjs logs` | Follow recent service logs |
+| `node tools/manage.mjs status` | Show services |
+| `node tools/manage.mjs check` | TypeScript build, tool tests, both Compose configs, Godot import/navigation |
+| `node tools/manage.mjs smoke` | Real API and official Godot SDK tests; temporary accounts are deleted |
+| `node tools/manage.mjs backup` | Write local PostgreSQL dump under ignored `backups/` |
+| `node tools/manage.mjs --env-file .env.production deploy` | Validate and deploy backend over SSH |
 
 Local API: <http://127.0.0.1:7350>. Console: <http://127.0.0.1:7351>, username `admin`, password from `.env`. No services use global container names. Give each game its own `COMPOSE_PROJECT_NAME` and local ports when running multiple games.
 
 For a physical Android device, set `LOCAL_BIND_IP=0.0.0.0` and `CLIENT_API_URL=http://YOUR_COMPUTER_LAN_IP:7350`, then run `up`. The device needs the same LAN and firewall access. Android emulator can use `http://10.0.2.2:7350`. Plain HTTP is for development; iOS should use a valid HTTPS endpoint. See [mobile setup](docs/mobile.md).
 
-For interview-guided mobile exports, use the [Android](.agents/skills/mobile-android-export/SKILL.md) or [iOS](.agents/skills/mobile-ios-export/SKILL.md) skill. Optional `.env.example` fields configure versions, team and real asset paths; signing passwords never enter generated presets. `python3 tools/export.py --env-file .env android-debug` produces a debug APK when SDK/templates are installed; `ios-project` exports an Xcode project on macOS. The helper does not publish or upload.
+For interview-guided mobile exports, use the [Android](.agents/skills/mobile-android-export/SKILL.md) or [iOS](.agents/skills/mobile-ios-export/SKILL.md) skill. Optional `.env.example` fields configure versions, team and real asset paths; signing passwords never enter generated presets. `node tools/export.mjs --env-file .env android-debug` produces a debug APK when SDK/templates are installed; `ios-project` exports an Xcode project on macOS. The helper does not publish or upload.
 
 ## Add a game idea
 

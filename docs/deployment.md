@@ -2,7 +2,7 @@
 
 Start with the [production interview skill](../.agents/skills/mobile-production-setup/SKILL.md) for host, SSH, firewall, secrets and recovery gates. The script alone does not audit or harden a VPS.
 
-The VPS needs Docker Engine and Compose v2 (`up --wait`), SSH access, tar, and free public ports 80/443. The SSH user must be able to run Docker and write a dedicated deployment directory. Set up the host and SSH known-host entry yourself; the script uses BatchMode and does not disable host-key checking or install host packages.
+The VPS needs Docker Engine and Compose v2 (`up --wait`), SSH access, Bash, tar, and free public ports 80/443. The SSH user must be able to run Docker and write a dedicated deployment directory. Set up the host and SSH known-host entry yourself; the script uses BatchMode and does not disable host-key checking or install host packages.
 
 ## First deployment
 
@@ -10,7 +10,7 @@ The VPS needs Docker Engine and Compose v2 (`up --wait`), SSH access, tar, and f
 2. Create a private production env file:
 
    ```sh
-   python3 tools/manage.py --env-file .env.production init
+   node tools/manage.mjs --env-file .env.production init
    ```
 
 3. Edit `.env.production`: set GAME_TITLE, BUNDLE_ID, a unique COMPOSE_PROJECT_NAME, API_DOMAIN, TLS_EMAIL, CLIENT_API_URL=`https://API_DOMAIN`, SSH_HOST (hostname/IP/SSH alias), SSH_USER, SSH_PORT and DEPLOY_PATH. Keep LOCAL_BIND_IP=127.0.0.1. Preserve the generated secrets across redeployments; changing POSTGRES_PASSWORD alone does not change an existing database role's password.
@@ -18,7 +18,7 @@ The VPS needs Docker Engine and Compose v2 (`up --wait`), SSH access, tar, and f
 5. Run local `check` and `smoke` against a running development stack. Then deploy:
 
    ```sh
-   python3 tools/manage.py --env-file .env.production deploy
+   node tools/manage.mjs --env-file .env.production deploy
    ```
 
 The runner validates production settings, installs the locked npm dependencies and compiles TypeScript locally, generates the matching public game config, validates Compose and Godot, uploads only the compiled JavaScript backend/config over SCP, keeps `.env.previous`, pulls pinned images, migrates the database, and waits for healthy PostgreSQL/Nakama. Caddy obtains and renews TLS. The VPS needs no Node/npm installation. The script removes the legacy starter Lua module when upgrading to the JavaScript runtime, preserving PostgreSQL data. The script does not upload the Godot game, source `.env`, erase volumes, install Docker, or change a firewall. Environment files are copied as private data and parsed by Compose.
@@ -35,7 +35,7 @@ Adjust the remote port if LOCAL_CONSOLE_PORT differs. Visit <http://127.0.0.1:73
 
 ## Updates and recovery
 
-Redeploy with the same project name/path/secrets to retain the database and Caddy volumes. Back up PostgreSQL before schema or image changes. For local backups, use `python3 tools/manage.py backup`. For production, run `docker compose exec -T postgres pg_dump -U nakama -d nakama` from DEPLOY_PATH over SSH and redirect the output to a private local backup. Verify restoring a dump on a disposable database before relying on it.
+Redeploy with the same project name/path/secrets to retain the database and Caddy volumes. Back up PostgreSQL before schema or image changes. For local backups, use `node tools/manage.mjs backup`. For production, run `docker compose exec -T postgres pg_dump -U nakama -d nakama` from DEPLOY_PATH over SSH and redirect the output to a private local backup. Verify restoring a dump on a disposable database before relying on it.
 
 A deployment is deliberately simple and briefly restarts Nakama. It is not an atomic release system: if pull/startup fails, inspect `docker compose -f compose.yml -f compose.production.yml logs --tail 100`. Correct the issue or redeploy the previous Git revision with the same env. `.env.previous` retains the last settings, but code is overwritten; keep the previous Git revision available. Database migrations may require a tested backup restore rather than an image downgrade. Never delete volumes as a troubleshooting shortcut.
 

@@ -19,19 +19,19 @@ Use existing answers/evidence. Inspect repo status, the configured Godot version
 
 ## Round 2 — verify tools before installing
 
-Check the Godot executable/version, matching export templates only if exporting, Python 3.9+, Node 22+ and npm, Git, Docker daemon, and Compose v2 with `up --wait` support. Useful read-only checks:
+Check the Godot executable/version, matching export templates only if exporting, Node 22+ and npm, Bash, Git, Docker daemon, and Compose v2 with `up --wait` support. Useful read-only checks:
 
 ```sh
-python3 --version
 node --version
 npm --version
+bash --version
 git --version
 docker version
 docker compose version
 docker compose up --help
 ```
 
-Run the selected Godot executable with `--version` using a safely constructed argument array. On Windows discover `py`/`python` before assuming `python3`. Do not hardcode this starter author's macOS paths. Use `GODOT_BIN` in `.env`.
+Run the selected Godot executable with `--version` using a safely constructed argument array. On Windows choose a consistent WSL2 environment (recommended) or a tested Git Bash setup for Bash/SSH/tar; do not mix Windows and Linux executable paths. Do not hardcode this starter author's macOS paths. Use `GODOT_BIN` in `.env`.
 
 If Docker is missing, guide the OS-appropriate supported Docker Desktop or Engine + Compose installation from official docs; ask about Windows WSL2 vs native shell before mixing paths. Distinguish daemon stopped, daemon permission failure, missing Compose, and unsupported version. Do not casually chmod the Docker socket or add broad privileges. Explain Linux Docker-group root equivalence before changing group membership. Recheck after installation/startup; do not claim Docker works from CLI availability alone.
 
@@ -39,7 +39,7 @@ If Docker is missing, guide the OS-appropriate supported Docker Desktop or Engin
 
 Ask for a working title, stable reverse-domain bundle ID, and whether other local games already use ports 7350/7351. Recommend a unique Compose project name and free ports. Keep portrait as the default unless the idea requires otherwise.
 
-- If `.env` is absent, run `python3 tools/manage.py init`.
+- If `.env` is absent, run `node tools/manage.mjs init`.
 - If it exists, validate through tooling; do not overwrite or print it.
 - Set `GAME_TITLE`, `BUNDLE_ID`, `COMPOSE_PROJECT_NAME`, `GODOT_BIN`, and local ports. Preserve existing secrets and player data.
 - All seven Nakama/database fields must be independently generated even locally; no default `localadmin`/`defaultkey` credentials. There is no extra developer bypass key to invent.
@@ -50,9 +50,9 @@ For Android emulator, explain 10.0.2.2 vs host loopback. For a physical phone as
 ## Round 4 — prove the vertical slice
 
 ```sh
-python3 tools/manage.py up
-python3 tools/manage.py check
-python3 tools/manage.py smoke
+node tools/manage.mjs up
+node tools/manage.mjs check
+node tools/manage.mjs smoke
 ```
 
 `up` installs locked npm dependencies, type-checks/builds TypeScript, creates the isolated PostgreSQL/Nakama stack, and waits for health. Official SDK is vendored; do not replace it with hand-written REST requests. Resolve failure at its actual layer before retrying. Inspect redacted diagnostics, not raw env dumps. Do not use `down -v` to cure a startup problem.

@@ -47,9 +47,9 @@ Set `APP_ICON`, `BOOT_SPLASH_IMAGE`, `ANDROID_ICON`, `ANDROID_ADAPTIVE_FOREGROUN
 Run `configure`, review the public generated Android preset and run `check`. Then:
 
 ```sh
-python3 tools/export.py --env-file .env android-debug
+node tools/export.mjs --env-file .env android-debug
 # After production/signing readiness:
-python3 tools/export.py --env-file .env.production android-release
+node tools/export.mjs --env-file .env.production android-release
 ```
 
 The helper emits APKs, not an AAB or a store upload. For Google Play, configure the version-matched Gradle/AAB export path in the template, keep identities/signing in the selected env, regenerate and verify the resulting bundle; use current official Godot/Play requirements. Do not rename an APK to .aab or claim the helper publishes. Play target API, billing/ads plugins and policy forms must match the actual game; do not invent permission/data disclosures.

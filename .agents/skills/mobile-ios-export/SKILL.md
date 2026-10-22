@@ -47,7 +47,7 @@ Reuse approved game art direction or ask a short style interview, then invoke im
 Regenerate with the selected env, review the public iOS preset, and run `check`. Then:
 
 ```sh
-python3 tools/export.py --env-file .env ios-project
+node tools/export.mjs --env-file .env ios-project
 # Or select .env.production once HTTPS production readiness is verified.
 ```
 

@@ -25,9 +25,9 @@ Verify a clean install, guest onboarding, email linking/login on a second instal
 Optional fields in `.env.example` are backward compatible with existing local env files. Missing values use documented defaults. `APP_ICON` and `BOOT_SPLASH_IMAGE` set project resources; Android launcher fields, `IOS_TEAM_ID`, iOS launch images and versions configure generated presets. Asset paths must be existing `res://` files inside this repository. `IOS_ICON` optionally specifies the opaque App Store master; `APP_ICON` supplies shared derived-size fallbacks. Generate artwork through the imagegen skill before calling branding complete.
 
 ```sh
-python3 tools/export.py --env-file .env android-debug
-python3 tools/export.py --env-file .env.production android-release
-python3 tools/export.py --env-file .env ios-project
+node tools/export.mjs --env-file .env android-debug
+node tools/export.mjs --env-file .env.production android-release
+node tools/export.mjs --env-file .env ios-project
 ```
 
 The helper emits APKs or a project-only Xcode archive, not AAB, signed IPA, or store uploads. Native Android signing overrides are read privately from the selected env file and passed only to Godot's process environment. Existing `.env` files need only the optional keys required by the chosen build. iOS private signing material stays in Keychain. SDK/JDK locations remain machine-local Editor Settings. For AAB/custom signing/entitlements, follow the interview and extend the per-game template with version-matched official settings.

@@ -30,8 +30,10 @@ For every new visible game-art or UI-art task, read and invoke the available **i
 - `client/core/preferences.gd`: device settings, Master audio, haptic preference.
 - `server/src/main.ts`: authenticated, validated, versioned server state transitions.
 - `addons/com.heroiclabs.nakama/`: pinned official Godot SDK; keep upstream code unmodified.
-- `tools/export.py`: Android APK / iOS project export with private signing environment.
-- `tools/manage.py`: config generation, local services, validation and SSH deployment.
+- `tools/export.mjs`: Android APK / iOS project export with private signing environment.
+- `infra/deploy-remote.sh`: Bash deployment steps executed over verified SSH.
+- `tools/lib.mjs`: shared env parsing, validation, safe subprocesses and configuration.
+- `tools/manage.mjs`: config generation, local services, validation and SSH deployment.
 
 ## Rules
 - Runtime TypeScript targets ES5 and runs inside Nakama, not Node.js. Use the official `nkruntime` types; no Node APIs or runtime imports. Register named RPC adapters in `InitModule`.
@@ -49,4 +51,4 @@ For every new visible game-art or UI-art task, read and invoke the available **i
 - Never use `docker compose down -v` without an explicit request to delete data.
 
 ## Validate
-Run `python3 tools/manage.py check`. For backend, authentication, or deployment changes, start the local stack with `up`, then run `smoke`. Use `python3 tools/manage.py build` for TypeScript type-check/build. `up` installs locked npm dependencies, builds and restarts Nakama to load the compiled module; `check` and `deploy` also build. Edit `server/src`, not generated `server/modules/main.js`. Check timeout/error handling, resume refresh, account switching and small-screen layout. Keep tests tied to behavior. Report which checks could not run. Device exports and a VPS deploy are separate from local tests.
+Run `node tools/manage.mjs check`. For backend, authentication, or deployment changes, start the local stack with `up`, then run `smoke`. Use `node tools/manage.mjs build` for TypeScript type-check/build. `up` installs locked npm dependencies, builds and restarts Nakama to load the compiled module; `check` and `deploy` also build. Edit `server/src`, not generated `server/modules/main.js`. Check timeout/error handling, resume refresh, account switching and small-screen layout. Keep tests tied to behavior. Report which checks could not run. Device exports and a VPS deploy are separate from local tests.

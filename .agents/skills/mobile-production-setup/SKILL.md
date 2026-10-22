@@ -46,7 +46,7 @@ Review release identity, Git revision, local tests, env validity, DNS, available
 After prerequisites are satisfied and the exact deployment is authorized (reuse prior authorization), run local `check`/`smoke` with development config, then:
 
 ```sh
-python3 tools/manage.py --env-file .env.production deploy
+node tools/manage.mjs --env-file .env.production deploy
 ```
 
 No Node/npm is needed on the VPS; only the compiled runtime/config and a server-only env subset are uploaded. Android signing credentials and workstation paths must remain local. Do not run `smoke` against production without agreement on disposable accounts. Verify service health, valid public HTTPS and redirect, no unexpected public ports, client guest/login/state flows on a deliberately chosen account, and tunnel-only console access. Recheck firewall bindings after deployment, not just before.

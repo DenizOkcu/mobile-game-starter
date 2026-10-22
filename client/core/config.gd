@@ -7,7 +7,7 @@ var error_message: String = ""
 
 func _ready() -> void:
 	if not FileAccess.file_exists("res://client/config.json"):
-		error_message = "Run python3 tools/manage.py init, then configure."
+		error_message = "Run node tools/manage.mjs init, then configure."
 		return
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://client/config.json"))
 	if not data is Dictionary or not data.get("api_url", "").begins_with("http"):
