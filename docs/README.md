@@ -1,9 +1,9 @@
 # Mobile Game Starter Docs
 
-`index.html` is the buildless landing page and documentation hub. It shares
-`site.css` and `site.js`; there are no packages, remote assets, or build steps.
-The main guides remain readable without JavaScript. JavaScript adds copy buttons,
-guide navigation highlighting, and an explicitly illustrative browser demo.
+`index.html` is the landing page and documentation hub. It uses `site.css` and
+`site.js` without packages, remote assets, or a build step. You can read the main
+guides without JavaScript. JavaScript adds copy buttons, highlights the current
+guide in the navigation, and runs the browser example.
 
 Preview from the repository root:
 
@@ -14,13 +14,13 @@ node tools/serve-docs.mjs
 Open `http://127.0.0.1:8080`. Opening `index.html` directly also works; if the
 browser denies clipboard access, copy buttons select the text for manual copying.
 
-The `docs/` directory can be served as static files. No hosting or deployment is
-configured by adding these files. Markdown source references are linked as files;
-the main guides are included directly in the HTML for browser reading.
+You can serve `docs/` as a static site. Adding these files does not configure
+hosting or deployment. The main guides are part of the HTML page; links to
+Markdown files open the detailed source documents.
 
 ## Keep content aligned with behavior
 
-The HTML is hand-maintained. Update the relevant section alongside source changes.
+We maintain the HTML by hand. When behavior changes, update the matching section.
 
 | Section | Source of truth |
 | --- | --- |
@@ -33,6 +33,6 @@ The HTML is hand-maintained. Update the relevant section alongside source change
 | Backend deployment | `deployment.md`, `../tools/manage.mjs` |
 | Shipping and scope | `README.md`, `verification.md`, `mobile.md` |
 
-The project name is engine-independent. Document the current Godot implementation
-explicitly; do not imply that other engine integrations already exist. Keep the
-browser demo labeled as an illustration rather than a real account or backend test.
+The project name leaves room for other engines, but the current client uses Godot.
+Make that clear in the docs. Label the browser example as an illustration: it does
+not create an account or test the backend.

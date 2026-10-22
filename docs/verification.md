@@ -1,29 +1,29 @@
-# Mobile Game Starter: Verification — 22 October 2026
+# Mobile Game Starter: Verification (22 October 2026)
 
-Completed on macOS with Godot 4.7.2 and the real Nakama 3.41.0 / PostgreSQL 17 Docker stack:
+These checks ran on macOS with Godot 4.7.2 and the Nakama 3.41.0 / PostgreSQL 17 Docker stack:
 
-- Environment parser/generation tests: random independent secrets, private permissions, overwrite refusal, production origin/bind validation, duplicate/shell-expression rejection.
+- Environment tests covered random independent secrets, private permissions, refusal to overwrite files, production origin and bind validation, and rejection of duplicate keys and shell expressions.
 - Local and production Compose configurations render successfully; the pinned Caddy container validates its configuration.
-- Local PostgreSQL backup command writes a private SQL dump. These infrastructure checks remain valid after switching the runtime to TypeScript.
+- The local PostgreSQL backup command wrote a private SQL dump. These infrastructure checks still apply after the switch to TypeScript.
 - Android resource-pack export succeeds and includes public client config while excluding env, server, tools and tests. This is a resource-pack check, not an APK build.
 - Strict TypeScript type-check and ES5 compilation pass.
-- Godot headless import and auth/menu/settings/game navigation pass without script errors.
-- Rendered desktop login and settings screens inspected at the 360×640 window size.
-- Real REST checks: guest auth, lazy player initialization, validated profile, rejection of arrays/extra intent fields, unauthenticated denial, distinct player isolation, private storage-write denial, eight concurrent tutorial requests, once-only reward, guest email linking, existing-account login, refresh and logout revocation, temporary account deletion.
-- Actual official Godot SDK transport: email creation/bootstrap, RPC encoding/decoding, canonical reward, duplicate completion, persisted refresh-token restore, guest SDK authentication, email linking preserving user ID, logout/login, and account deletion. The test restores any pre-existing starter session file afterward.
+- Godot headless import and navigation through authentication, menus, settings, and the game passed without script errors.
+- The desktop login and settings screens were inspected at a 360×640 window size.
+- REST tests covered guest authentication, player initialization on first read, profile validation, rejection of arrays and extra intent fields, denial of unauthenticated requests, player isolation, and denial of direct writes to private storage. They also checked eight concurrent tutorial requests, the once-only reward, guest email linking, login to an existing account, refresh and logout revocation, and deletion of temporary accounts.
+- Tests through the official Godot SDK covered email account creation and bootstrap, RPC encoding and decoding, the server's reward snapshot, duplicate tutorial completion, restoration from a saved refresh token, guest authentication, email linking without changing the user ID, logout and login, and account deletion. The test restores any pre-existing starter session file afterward.
 
-The local backend is running with Compose project name `mobile-starter`. Stop it with `node tools/manage.mjs down`; this preserves data.
+At the time of verification, the local backend was running under Compose project name `mobile-starter`. Use `node tools/manage.mjs down` to stop it while keeping data.
 
-Not completed: Android/iOS export or device run, store signing, external VPS deployment, DNS/TLS issuance on a real domain. Godot reported that Android build-tools are not configured on this machine. Follow docs/mobile.md for the device prerequisites and docs/deployment.md for the VPS workflow. A successful local check does not imply these platform checks have passed.
+These checks did not cover Android/iOS exports or device runs, store signing, an external VPS deployment, or DNS and TLS issuance on a real domain. Godot reported that Android build-tools were not configured on this machine. See docs/mobile.md for device prerequisites and docs/deployment.md for VPS setup. Passing local checks does not verify those steps.
 
 ## Guided setup additions
 
-Four repo-local skills pass the skill-creator validator, and all local documentation links resolve. A read-only independent forward-test exercised an existing shared-ingress Droplet with only root access; its resulting lockout, ingress and environment-separation gates were reviewed and corrected.
+The four repository skills passed the skill-creator validator, and all local documentation links resolved. An independent read-only test of the guidance used an existing Droplet with shared ingress and only root access. The review found and corrected gaps in the conditions for avoiding lockout, handling ingress, and separating environments.
 
-Twelve Node.js built-in tests now cover configuration and export boundaries, including backward-compatible optional inputs, icon path confinement, generated metadata, private signing allowlists/redaction, server-only deployment env serialization and rejection of root production SSH users. The TypeScript/Godot check, real local API/SDK smoke tests and Android resource-pack export pass after these additions. The resource pack contains the SDK and public config; setup notes, skill files, backend code and secrets stay out.
+Twelve tests using Node.js built-ins cover configuration and export boundaries: optional inputs that work with older env files, icon paths confined to the repository, generated metadata, signing allowlists and redaction, serialization of server-only deployment variables, and rejection of root production SSH users. After these additions, the TypeScript/Godot check, local API/SDK smoke tests, and Android resource-pack export passed. The resource pack includes the SDK and public config while excluding setup notes, skill files, backend code, and secrets.
 
-`tools/export.mjs` is checked with a mocked exporter for process/credential boundaries. No real APK, signed release, Xcode device build or VPS hardening/deployment was performed as part of creating the guidance. Existing Android SDK build-tools and per-game Apple signing prerequisites still need the interviews; the helper does not claim to bypass them.
+Tests of `tools/export.mjs` use a mocked exporter to check process and credential boundaries. Creating the guidance did not include building a real APK, signing a release, building for an Xcode device, or hardening or deploying a VPS. The Android SDK build-tools and each game's Apple signing setup still need attention in the interviews; the helper cannot bypass them.
 
 ## Node.js and Bash tooling migration
 
-The project tooling, API smoke checks and unit tests now use Node.js built-ins, with no extra runtime packages. Remote deployment uses `infra/deploy-remote.sh` over strict SSH; the env file is read as data and is never sourced. The 12 tooling checks cover parser/credential boundaries, export safety, literal subprocess arguments, Bash deployment behavior and the local docs preview server. TypeScript compilation, Compose validation, Godot navigation and real API/SDK integration checks pass. Actual signed mobile builds and a production VPS deployment remain separate checks.
+The project tooling, API smoke checks, and unit tests now use Node.js built-ins without extra runtime packages. Remote deployment runs `infra/deploy-remote.sh` over SSH with strict host-key checking. It reads the env file as data and never sources it. The 12 tooling checks cover parser and credential boundaries, export safety, literal subprocess arguments, Bash deployment behavior, and the local docs preview server. TypeScript compilation, Compose validation, Godot navigation, and API/SDK integration checks passed. Signed mobile builds and production VPS deployment still need separate verification.

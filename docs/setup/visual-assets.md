@@ -1,18 +1,20 @@
-# Mobile Game Starter: Image-generation-first visual production
+# Mobile Game Starter: Game art and UI assets
 
-This is a project requirement for future game work, including prototypes. Read and invoke the available **imagegen** skill before creating or replacing character art, world/game objects, inventory art, backgrounds, app icons, splash art, or the visual skin of menus/HUD/buttons/panels. Use its built-in image-generation tool by default. Respect its rules for editing, transparency, output files and fallback authorization.
+Use the **imagegen** skill for game artwork, including prototypes. Read and invoke it before creating or replacing characters, world and game objects, inventory art, backgrounds, app icons, splash art, or the visual skin of menus, HUDs, buttons, and panels. Use its built-in image-generation tool by default, and follow its rules for editing, transparency, output files, and permission to use a fallback.
 
-Do not substitute circles, rectangles, polygons, emoji, procedural `_draw()` art, SVG stand-ins, CSS-style shapes or a default-widget-only screen for the requested visible game art/UI to save effort. Existing starter widgets are infrastructure scaffolding, not a finished art direction. This does not forbid collision shapes, invisible hit regions, layout containers, progress/health indicators, readable live text, accessibility focus rings or real Godot controls. Keep interaction/labels native and accessible; skin controls with generated textures and nine-patch assets. Do not flatten the whole interface into one image with baked-in text.
+Do not replace requested game art or UI artwork with circles, rectangles, polygons, emoji, procedural `_draw()` art, SVG stand-ins, CSS-style shapes, or default widgets to save effort. The starter widgets exist to make setup usable; they do not define the finished art style.
 
-An explicit user request for vector, geometric, wireframe or primitive-placeholder output takes precedence. If image generation is unavailable, state the missing capability, continue non-art work, and leave the asset milestone pending; do not silently manufacture a shape-based substitute or claim it is finished. Follow the imagegen skill before offering a CLI fallback; do not request an API key for its built-in tool.
+Keep collision shapes, invisible hit regions, layout containers, progress and health indicators, live text, focus rings, and real Godot controls in code. Use native, accessible controls and labels, with generated textures and nine-patch assets for their appearance. Do not bake the whole interface and its text into one image.
+
+An explicit user request for vector, geometric, wireframe, or primitive-placeholder output takes precedence. If image generation is unavailable, explain what is missing and continue work that does not need art. Leave the assets pending rather than drawing substitutes or claiming they are finished. Follow the imagegen skill before offering a CLI fallback. Do not ask for an API key for the built-in tool.
 
 ## Short art interview
 
-Ask about the game's theme and target audience; visual style/references and palette; required characters/objects/screens; portrait/landscape and camera angle; animation needs and accessibility constraints. Reuse existing approved art direction. Record only the useful decisions in `docs/art-direction.md` when making a game, not as an empty template in every starter.
+Ask about the theme, audience, visual references, palette, and required characters, objects, and screens. Check orientation, camera angle, animation needs, and accessibility constraints. Reuse any approved art direction. When making a game, record useful decisions in `docs/art-direction.md`; do not add an empty template to every starter.
 
-Create a small asset list before generating. For each asset record use, final dimensions/aspect ratio, transparency, safe padding, anchors/pivot, camera/lighting, and variants/states. Generate one coherent style reference and use it for later assets. Ask for real alpha on sprites/UI foregrounds. Keep interactive text out of art. For animation, explicitly plan frames/directions and check consistency; an attractive still image is not a ready sprite sheet.
+Before generating, list the assets you need. For each, record its use, dimensions and aspect ratio, transparency, safe padding, anchors and pivot, camera and lighting, and variants or states. Generate a style reference first and use it for later assets. Request real alpha transparency for sprites and UI foregrounds, and keep interactive text out of the art. Plan animation frames and directions, then check them for consistency. A still image is not a ready sprite sheet.
 
-Copy selected generated outputs into the repo, e.g. `assets/art/`, `assets/ui/`, `assets/branding/`; never reference a chat attachment or machine-specific generated-image cache from a Godot scene. Record concise generation prompts/provenance and any third-party asset license. Do not fabricate rights to a brand or reference image.
+Copy the selected outputs into the repository, for example `assets/art/`, `assets/ui/`, or `assets/branding/`. Godot scenes must not reference chat attachments or a generated-image cache tied to one machine. Record short generation prompts, where each asset came from, and any third-party license. Do not claim rights to a brand or reference image without evidence.
 
 ## Export assets
 
@@ -25,6 +27,6 @@ Copy selected generated outputs into the repo, e.g. `assets/art/`, `assets/ui/`,
 | iOS launch art | Consistent @2x/@3x images and launch storyboard/background; simple static content suited to launch, not an ad or a fake loading progress bar. |
 | Menu/HUD skin | Generated background and button/panel assets with normal/pressed/disabled states as needed; nine-patch safe borders and room for native labels. |
 
-Use the imagegen skill for visual design and edits. Mechanical resize/crop/reformat from an approved source may use ordinary image tooling; don't use that as a back door to draw replacement artwork. Inspect image files for actual size, alpha, edges and crop before wiring them. Run Godot import, preview device-sized screens and verify exported assets; successful image generation alone is not acceptance.
+Use the imagegen skill for visual design and edits. Ordinary image tools can resize, crop, or reformat an approved source, but must not draw replacement artwork. Before integration, inspect the actual dimensions, alpha, edges, and crop. Run Godot import, preview screens at device sizes, and check the exported assets. Generating an image does not verify that it works in the game.
 
-Map approved asset paths through `.env` and `configure`. Blank values keep the starter runnable, but an export interview cannot label branding complete while using missing/default assets.
+Set approved asset paths through `.env` and `configure`. Blank values let the starter run, but branding is not complete while required assets are missing or still use defaults.

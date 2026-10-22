@@ -1,16 +1,16 @@
 # Mobile Game Starter
 
-Explore the [website and documentation](docs/index.html) for an overview, quickstart, and guides to building, exporting, and deploying your game. See [docs/README.md](docs/README.md) for local website preview instructions.
+The [website and documentation](docs/index.html) cover setup, game development, mobile exports, and backend deployment. To preview the website locally, see [docs/README.md](docs/README.md).
 
-Mobile Game Starter is a small starting point for mobile prototypes and LLM-assisted development. Godot 4.7.2, typed GDScript, Nakama TypeScript, PostgreSQL and Docker Compose, with dependency-free Node.js tooling and a Bash deployment script. Uses the pinned official Nakama Godot SDK. The backend compiles with TypeScript directly, without a bundler.
+Mobile Game Starter is a kit for building mobile game prototypes, on your own or with a coding assistant. It uses Godot 4.7.2, typed GDScript, Nakama TypeScript, PostgreSQL, and Docker Compose. Node.js tooling has no extra dependencies, and a Bash script handles deployment. The official Nakama Godot SDK is pinned, and TypeScript compiles the backend directly without a bundler.
 
-Includes explicit guest access, email registration/login, guest-to-email linking, refresh-token restore, logout, account deletion, a main menu, account/profile screen, persistent volume/haptics/reduced-motion settings, and a replaceable game scene. A server-owned player record and once-only tutorial reward demonstrate the complete client → intent → database → canonical snapshot loop.
+The kit includes guest access, email registration and login, guest-to-email linking, session restore using refresh tokens, logout, and account deletion. It also has a main menu, account and profile screen, device settings for volume, haptics, and reduced motion, and a game scene you can replace. The tutorial grants a reward once per account: the client sends an action, the server updates the player record, and the client receives the saved state.
 
 ## Guided setup with an LLM
 
-Start at **[the setup entry point](docs/start-here.md)**. Say “Help me get started locally” and the assistant will interview you, check your tools, and guide the first playable run. Repo-local skills also cover secure VPS production deployment and Android/iOS exports, including signing and generated icons/splash art.
+Start with [the setup guide](docs/start-here.md). Say "Help me get started locally" and the assistant will ask a few questions, check your tools, and help you run the game. The repository also includes skills for secure VPS deployment and Android/iOS exports, including signing, generated icons, and splash art.
 
-The [visual asset policy](docs/setup/visual-assets.md) requires the imagegen skill for game art and UI skins; the existing default widgets are setup scaffolding.
+The [visual asset policy](docs/setup/visual-assets.md) requires the imagegen skill for game art and UI skins. The default widgets are there to get setup working, not to define your game's art style.
 
 ## Start locally
 
@@ -42,20 +42,20 @@ Local API: <http://127.0.0.1:7350>. Console: <http://127.0.0.1:7351>, username `
 
 For a physical Android device, set `LOCAL_BIND_IP=0.0.0.0` and `CLIENT_API_URL=http://YOUR_COMPUTER_LAN_IP:7350`, then run `up`. The device needs the same LAN and firewall access. Android emulator can use `http://10.0.2.2:7350`. Plain HTTP is for development; iOS should use a valid HTTPS endpoint. See [mobile setup](docs/mobile.md).
 
-For interview-guided mobile exports, use the [Android](.agents/skills/mobile-android-export/SKILL.md) or [iOS](.agents/skills/mobile-ios-export/SKILL.md) skill. Optional `.env.example` fields configure versions, team and real asset paths; signing passwords never enter generated presets. `node tools/export.mjs --env-file .env android-debug` produces a debug APK when SDK/templates are installed; `ios-project` exports an Xcode project on macOS. The helper does not publish or upload.
+For help with mobile exports, use the [Android](.agents/skills/mobile-android-export/SKILL.md) or [iOS](.agents/skills/mobile-ios-export/SKILL.md) skill. Optional fields in `.env.example` set the app version, team, and asset paths. Signing passwords stay out of generated presets. With the SDK and templates installed, `node tools/export.mjs --env-file .env android-debug` produces a debug APK. On macOS, `ios-project` exports an Xcode project. The helper does not publish or upload builds.
 
 ## Add a game idea
 
-Give an LLM [AGENTS.md](AGENTS.md) and your idea using [the starter prompt](docs/new-game-prompt.md). Replace `client/game/game.tscn` and `game.gd`; retain the account/menu infrastructure. Add narrow server intents to `server/src/main.ts` only when gameplay needs persistence. `complete_tutorial` is an example transition, not a reusable reward/score submission API.
+Give your coding assistant [AGENTS.md](AGENTS.md) and your idea using [the starter prompt](docs/new-game-prompt.md). Build your loop in `client/game/game.tscn` and `game.gd`, keeping the accounts and menus. Add a specific server action to `server/src/main.ts` when gameplay needs saved state. The included `complete_tutorial` action shows one state change; it is not a general API for submitting scores or claiming rewards.
 
 The official Godot SDK 3.4.0 is vendored under `addons/com.heroiclabs.nakama/` with its license; see [dependency provenance](docs/dependencies.md). The npm lockfile pins the compiler and official runtime types. Nothing is installed on the VPS beyond the compiled module and existing Docker stack.
 
 Read [architecture and RPC contracts](docs/architecture.md), [deployment](docs/deployment.md), and the [project survey](docs/project-survey.md).
 
-## Deliberate limits
+## Scope and release requirements
 
-This is an online prototype foundation. Gameplay is gated on a successful server bootstrap. There is no offline queue, client authority over coins, realtime socket, generic service framework, analytics, purchases, ads, push notifications, social login, email verification, or password-reset email delivery. Add these when an actual game requires them. The tutorial completion is player-declared and grants a one-time onboarding bonus; it does not prove a game result. Display names are player labels separate from Nakama usernames.
+The game needs a working server connection to authenticate and load player state before play. The client cannot set its own coin balance. The kit does not include an offline queue, realtime socket, generic service framework, analytics, purchases, ads, push notifications, social login, email verification, or password-reset email delivery. Add these as your game needs them. Players declare tutorial completion themselves, so its one-time bonus does not prove a game result. Display names are player labels, separate from Nakama usernames.
 
-The refresh token lives in Godot's app-private `user://session.cfg`; passwords are never saved. For a shipped game with a stronger local-token threat model, replace this persistence with platform Keychain/Keystore integration. Logout clears local credentials even if the network prevents remote revocation. Guest access is tied to a random installation ID and can be lost on uninstall unless email is linked.
+The refresh token lives in Godot's app-private `user://session.cfg`; the client never saves passwords. If your shipped game needs stronger protection for tokens on the device, use the platform Keychain or Keystore. Logout clears local credentials even when a network failure prevents remote revocation. Guest access uses a random installation ID. Players can lose access after uninstalling unless they have linked an email.
 
-Settings persist on the device. Master volume controls Godot's Master bus, haptics controls the example vibration, and reduced motion is a preference for new gameplay animations; the starter has no animations. iOS and Android signing, store provisioning, and physical-device checks remain per-game setup.
+Settings stay on the device. Master volume controls Godot's Master bus, and the haptics setting controls the example vibration. The starter has no animations; honor the reduced-motion preference when you add them. Each game still needs iOS and Android signing, store provisioning, and checks on physical devices.

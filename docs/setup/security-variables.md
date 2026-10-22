@@ -1,6 +1,6 @@
 # Mobile Game Starter: Configuration and key ownership
 
-The setup skills use this table rather than inventing additional Nakama keys. `init` generates distinct URL-safe random values for all seven backend key/password fields, in a mode-0600 env file.
+The setup skills use the Nakama keys in this table; they must not invent additional keys. `init` generates a distinct URL-safe random value for each of the seven backend key and password fields and writes them to a mode-0600 env file.
 
 | Field | Meaning | Required handling |
 | --- | --- | --- |
@@ -12,13 +12,15 @@ The setup skills use this table rather than inventing additional Nakama keys. `i
 | `NAKAMA_CONSOLE_PASSWORD` | Console admin password (`admin`) | Server only; access console through SSH tunnel. |
 | `NAKAMA_CONSOLE_SIGNING_KEY` | Console session signing key | Server only, distinct from game session keys. |
 
-For production verify all seven are present, random, different from one another, and different from development values. Compare inside a local checker and report only pass/fail/key names. Never paste hashes or prefixes as a substitute for keeping a secret private. The env validator verifies minimum format/length and within-file uniqueness; it does **not** establish randomness or compare environments. Independent `init` runs are the normal provenance for randomness. If dev credentials may have reached production, prepare a rotation/migration and session-impact plan instead of silently regenerating keys.
+Before deploying, verify that all seven values are present, random, different from one another, and different from development values. Compare them in a local checker and report only pass/fail and key names. Keep hashes and prefixes private too.
 
-There is no separate magic Nakama “development key.” Development uses its own seven values plus independent debug mobile signing keys. Audit TypeScript registration for debug/admin/reset/economy endpoints before production. The current runtime registers only `get_state`, `update_profile`, and `complete_tutorial`; the last is a player-declared once-only onboarding example, not proof of game results. New developer capabilities must default off, use trusted server-side authorization, and never rely on a client boolean or the public server key.
+The env validator checks minimum format and length and uniqueness within one file. It cannot verify randomness or compare environments. Use independent `init` runs to generate random credentials. If development credentials may already be in production, plan the rotation, any migration, and the effect on sessions before changing keys. Do not silently regenerate them.
 
-The deployment tool serializes only a server-variable allowlist; Android signing fields, client configuration and local SDK paths are never uploaded even if present in the selected env file. The archive and server env use private permissions.
+Nakama has no separate "development key." Development uses its own seven values and independent debug mobile signing keys. Before production, check TypeScript registration for debug, admin, reset, or economy endpoints. The current runtime registers only `get_state`, `update_profile`, and `complete_tutorial`. Players declare tutorial completion themselves, so that action demonstrates a once-only onboarding reward without proving a game result. Any new developer capabilities must default to off and require trusted server authorization. A client boolean or the public server key cannot authorize them.
 
-SSH private keys, Android keystores, Apple signing private keys, and optional provider/store API tokens are separate credentials. Keep them out of Git, game assets and deployment bundles. Use scoped provider tokens only if an explicitly authorized automation actually needs them; a manual DigitalOcean setup needs no API token in this game repo. Built-in image generation needs no OpenAI API key.
+The deployment tool serializes only allowlisted server variables. It does not upload Android signing fields, client configuration, or local SDK paths, even when the selected env file contains them. The archive and server env file have private permissions.
+
+SSH private keys, Android keystores, Apple signing private keys, and optional provider or store API tokens are separate credentials. Keep them out of Git, game assets, and deployment bundles. Use scoped provider tokens only for explicitly authorized automation that needs them. A manual DigitalOcean setup does not need an API token in the game repository, and built-in image generation does not need an OpenAI API key.
 
 ## Non-secret operational inputs
 
@@ -28,4 +30,4 @@ SSH private keys, Android keystores, Apple signing private keys, and optional pr
 - Production routing: `API_DOMAIN`, `TLS_EMAIL`, `SSH_HOST`, `SSH_USER`, `SSH_PORT`, `DEPLOY_PATH`; HTTPS origin must match the domain, API bind stays loopback, SSH user is non-root.
 - Public export metadata/assets: see platform skills and `.env.example`. Signing fields are optional until that build type is requested.
 
-Do not run production `smoke` casually: it creates/deletes test accounts on the selected server. Local smoke is the default. Production verification should use a deliberately agreed disposable account and check its deletion.
+Run `smoke` locally by default. It creates and deletes test accounts on the selected server, so agree on a disposable account before verifying production and confirm that it is deleted afterward.

@@ -1,10 +1,10 @@
 # Mobile Game Starter: Mobile workflow
 
-Start with the [Android interview](../.agents/skills/mobile-android-export/SKILL.md) or [iOS interview](../.agents/skills/mobile-ios-export/SKILL.md). They cover prerequisites, private signing, generated branding and device evidence a few questions at a time.
+Use the [Android interview](../.agents/skills/mobile-android-export/SKILL.md) or [iOS interview](../.agents/skills/mobile-ios-export/SKILL.md) for help with prerequisites, private signing, generated branding, and checks on a device. Each asks a few questions at a time.
 
-The client uses a 720×1280 portrait canvas with Compatibility rendering. UI has large controls and scrolls on short displays. Test touch, keyboard avoidance, safe areas, resume and network interruptions on the actual target device. Mouse emulation helps iteration but is not a device test.
+The client uses a 720×1280 portrait canvas with Compatibility rendering. Controls are large, and screens scroll on short displays. Test touch, keyboard avoidance, safe areas, resume, and network interruptions on the target device. Mouse emulation is useful while developing, but you still need a device test.
 
-Run `configure` after editing GAME_TITLE, BUNDLE_ID, CLIENT_API_URL, NAKAMA_SERVER_KEY, APP_VERSION/APP_BUILD_NUMBER, team or asset fields. Public config is explicitly included by both export presets; server files, env files and tooling are excluded. Do not add server credentials to GDScript.
+Run `configure` after changing GAME_TITLE, BUNDLE_ID, CLIENT_API_URL, NAKAMA_SERVER_KEY, APP_VERSION/APP_BUILD_NUMBER, team, or asset fields. Both export presets include public config and exclude server files, env files, and tooling. Keep server credentials out of GDScript.
 
 ## Android
 
@@ -14,15 +14,17 @@ For the emulator use `http://10.0.2.2:7350`. For a phone use the development com
 
 ## iOS
 
-Use macOS, Xcode, matching Godot export templates, an Apple developer team, and a unique BUNDLE_ID. Set `IOS_TEAM_ID` in the selected env file and regenerate. The preset exports project-only by default; Xcode owns the subsequent signing/archive step. Configure signing/provisioning in Xcode for the generated project. Use a valid HTTPS backend; no broad App Transport Security exception is included.
+You need macOS, Xcode, matching Godot export templates, an Apple developer team, and a unique BUNDLE_ID. Set `IOS_TEAM_ID` in the selected env file and regenerate the presets. By default, the preset exports a project only. Configure signing and provisioning in Xcode, then use Xcode to sign and archive the build. Use a valid HTTPS backend; the starter does not include a broad App Transport Security exception.
 
 ## Before shipping a game
 
-Verify a clean install, guest onboarding, email linking/login on a second installation, logout, account deletion, app background/resume, lost connectivity during a write, settings persistence, portrait layout on small and notched screens, and audio/haptic behavior. Reduced-motion is exposed as `Preferences.reduced_motion`; new animations must honor it. This scaffold does not include store compliance content or promise device validation.
+Test a clean install, guest onboarding, email linking and login on a second installation, logout, and account deletion. Also check background/resume, lost connectivity during a write, saved settings, portrait layout on small and notched screens, audio, and haptics. New animations must honor `Preferences.reduced_motion`. You still need to prepare store compliance content and validate the game on devices.
 
 ## Env-driven export inputs
 
-Optional fields in `.env.example` are backward compatible with existing local env files. Missing values use documented defaults. `APP_ICON` and `BOOT_SPLASH_IMAGE` set project resources; Android launcher fields, `IOS_TEAM_ID`, iOS launch images and versions configure generated presets. Asset paths must be existing `res://` files inside this repository. `IOS_ICON` optionally specifies the opaque App Store master; `APP_ICON` supplies shared derived-size fallbacks. Generate artwork through the imagegen skill before calling branding complete.
+The optional fields in `.env.example` work with existing local env files. Missing values use the documented defaults. `APP_ICON` and `BOOT_SPLASH_IMAGE` set project resources. Android launcher fields, `IOS_TEAM_ID`, iOS launch images, and versions configure the generated presets.
+
+Asset paths must point to existing `res://` files inside this repository. Use `IOS_ICON` to specify an opaque App Store master; otherwise, `APP_ICON` supplies shared fallbacks at the required sizes. Generate artwork with the imagegen skill before marking branding complete.
 
 ```sh
 node tools/export.mjs --env-file .env android-debug
@@ -30,4 +32,6 @@ node tools/export.mjs --env-file .env.production android-release
 node tools/export.mjs --env-file .env ios-project
 ```
 
-The helper emits APKs or a project-only Xcode archive, not AAB, signed IPA, or store uploads. Native Android signing overrides are read privately from the selected env file and passed only to Godot's process environment. Existing `.env` files need only the optional keys required by the chosen build. iOS private signing material stays in Keychain. SDK/JDK locations remain machine-local Editor Settings. For AAB/custom signing/entitlements, follow the interview and extend the per-game template with version-matched official settings.
+The helper produces APKs or an Xcode project archive. It does not produce AABs or signed IPAs, or upload to stores. It reads Android signing overrides privately from the selected env file and passes them only to Godot's process environment. Add only the optional keys your chosen build needs to an existing `.env` file.
+
+Keep private iOS signing material in Keychain and SDK/JDK locations in the machine's Editor Settings. For AABs, custom signing, or entitlements, follow the interview and extend your game's template with official settings that match the Godot version.
