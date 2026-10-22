@@ -1,0 +1,4 @@
+interface:
+  display_name: "Android export interview"
+  short_description: "Prepare Android tools, signing and generated artwork"
+  default_prompt: "Use $mobile-android-export to interview me and guide this setup, checking existing prerequisites first."

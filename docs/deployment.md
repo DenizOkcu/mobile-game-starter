@@ -1,5 +1,7 @@
 # VPS deployment
 
+Start with the [production interview skill](../.agents/skills/mobile-production-setup/SKILL.md) for host, SSH, firewall, secrets and recovery gates. The script alone does not audit or harden a VPS.
+
 The VPS needs Docker Engine and Compose v2 (`up --wait`), SSH access, tar, and free public ports 80/443. The SSH user must be able to run Docker and write a dedicated deployment directory. Set up the host and SSH known-host entry yourself; the script uses BatchMode and does not disable host-key checking or install host packages.
 
 ## First deployment
@@ -37,4 +39,6 @@ Redeploy with the same project name/path/secrets to retain the database and Cadd
 
 A deployment is deliberately simple and briefly restarts Nakama. It is not an atomic release system: if pull/startup fails, inspect `docker compose -f compose.yml -f compose.production.yml logs --tail 100`. Correct the issue or redeploy the previous Git revision with the same env. `.env.previous` retains the last settings, but code is overwritten; keep the previous Git revision available. Database migrations may require a tested backup restore rather than an image downgrade. Never delete volumes as a troubleshooting shortcut.
 
-Only deploy from trusted source. The script sends the selected env file to the designated host. It does not connect to any VPS until SSH settings have been supplied and `deploy` is explicitly invoked.
+Only deploy from trusted source. The script derives a server-only env subset from the selected file for the designated host; mobile keystore passwords, local paths and client/export settings are not uploaded. It does not connect to any VPS until SSH settings have been supplied and `deploy` is explicitly invoked.
+
+Production SSH_USER must be non-root. The deploy runner uses BatchMode and strict host-key checking; enroll a host key only after verifying its fingerprint through a trusted channel. Docker access for the deploy user is root-equivalent unless a separately verified rootless setup is used. Keep private env files and backups protected, and verify public exposure with provider firewall evidence as described by the interview.

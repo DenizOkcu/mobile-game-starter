@@ -1,0 +1,4 @@
+interface:
+  display_name: "iOS export interview"
+  short_description: "Prepare Xcode, signing and generated iOS artwork"
+  default_prompt: "Use $mobile-ios-export to interview me and guide this setup, checking existing prerequisites first."

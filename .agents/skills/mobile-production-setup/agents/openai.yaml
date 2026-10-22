@@ -1,0 +1,4 @@
+interface:
+  display_name: "Secure production interview"
+  short_description: "Prepare SSH, VPS security and production deployment"
+  default_prompt: "Use $mobile-production-setup to interview me and guide this setup, checking existing prerequisites first."

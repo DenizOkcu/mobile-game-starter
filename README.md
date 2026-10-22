@@ -4,6 +4,12 @@ A small starting point for mobile prototypes and LLM-assisted development. Godot
 
 Includes explicit guest access, email registration/login, guest-to-email linking, refresh-token restore, logout, account deletion, a main menu, account/profile screen, persistent volume/haptics/reduced-motion settings, and a replaceable game scene. A server-owned player record and once-only tutorial reward demonstrate the complete client → intent → database → canonical snapshot loop.
 
+## Guided setup with an LLM
+
+Start at **[the setup entry point](docs/start-here.md)**. Say “Help me get started locally” and the assistant will interview you, check your tools, and guide the first playable run. Repo-local skills also cover secure VPS production deployment and Android/iOS exports, including signing and generated icons/splash art.
+
+The [visual asset policy](docs/setup/visual-assets.md) requires the imagegen skill for game art and UI skins; the existing default widgets are setup scaffolding.
+
 ## Start locally
 
 Prerequisites: Godot 4.7.2, Node.js 22+ with npm, Python 3.9+, Docker with Compose v2 supporting `up --wait`.
@@ -33,6 +39,8 @@ Open `project.godot` in Godot and press F5. Click **Play as guest**, then **Play
 Local API: <http://127.0.0.1:7350>. Console: <http://127.0.0.1:7351>, username `admin`, password from `.env`. No services use global container names. Give each game its own `COMPOSE_PROJECT_NAME` and local ports when running multiple games.
 
 For a physical Android device, set `LOCAL_BIND_IP=0.0.0.0` and `CLIENT_API_URL=http://YOUR_COMPUTER_LAN_IP:7350`, then run `up`. The device needs the same LAN and firewall access. Android emulator can use `http://10.0.2.2:7350`. Plain HTTP is for development; iOS should use a valid HTTPS endpoint. See [mobile setup](docs/mobile.md).
+
+For interview-guided mobile exports, use the [Android](.agents/skills/mobile-android-export/SKILL.md) or [iOS](.agents/skills/mobile-ios-export/SKILL.md) skill. Optional `.env.example` fields configure versions, team and real asset paths; signing passwords never enter generated presets. `python3 tools/export.py --env-file .env android-debug` produces a debug APK when SDK/templates are installed; `ios-project` exports an Xcode project on macOS. The helper does not publish or upload.
 
 ## Add a game idea
 

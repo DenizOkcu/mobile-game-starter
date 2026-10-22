@@ -20,6 +20,22 @@ SECRETS = ('POSTGRES_PASSWORD', 'NAKAMA_SERVER_KEY', 'NAKAMA_SESSION_KEY',
            'NAKAMA_CONSOLE_SIGNING_KEY')
 
 
+# Public export metadata only; signing credentials are passed to Godot separately.
+EXPORT_OPTIONS = {
+    'APP_VERSION': ('version/name', '0.1.0'),
+    'APP_BUILD_NUMBER': ('version/code', '1'),
+    'APP_ICON': ('', ''), 'BOOT_SPLASH_IMAGE': ('', ''),
+    'ANDROID_ICON': ('launcher_icons/main_192x192', ''),
+    'ANDROID_ADAPTIVE_FOREGROUND': ('launcher_icons/adaptive_foreground_432x432', ''),
+    'ANDROID_ADAPTIVE_BACKGROUND': ('launcher_icons/adaptive_background_432x432', ''),
+    'ANDROID_ADAPTIVE_MONOCHROME': ('launcher_icons/adaptive_monochrome_432x432', ''),
+    'IOS_TEAM_ID': ('application/app_store_team_id', ''),
+    'IOS_ICON': ('icons/app_store_1024x1024', ''),
+    'IOS_LAUNCH_IMAGE_2X': ('storyboard/custom_image@2x', ''),
+    'IOS_LAUNCH_IMAGE_3X': ('storyboard/custom_image@3x', ''),
+}
+
+
 def read_env(path):
     result = {}
     for number, line in enumerate(Path(path).read_text().splitlines(), 1):
@@ -36,7 +52,8 @@ def read_env(path):
 
 
 def validate(env, production=False):
-    missing = set(read_env(ROOT / '.env.example')) - set(env)
+    # Mobile export fields are optional for existing/local environments.
+    missing = {k for k in read_env(ROOT / '.env.example') if k not in EXPORT_OPTIONS and not k.startswith('GODOT_ANDROID_KEYSTORE_')} - set(env)
     if missing:
         raise ValueError('Missing env keys: ' + ', '.join(sorted(missing)))
     for key in SECRETS:
@@ -62,6 +79,8 @@ def validate(env, production=False):
         if not re.fullmatch(r'[a-zA-Z0-9./_-]+:[a-zA-Z0-9._-]+', env[key]) or env[key].endswith(':latest'):
             raise ValueError(f'{key}: use a pinned image tag')
     if production:
+        if env['SSH_USER'] == 'root':
+            raise ValueError('Use a dedicated non-root production SSH_USER')
         domain = env['API_DOMAIN']
         if not re.fullmatch(r'[a-z0-9]+(?:[.-][a-z0-9]+)+', domain) or domain.endswith('example.com'):
             raise ValueError('Set a real API_DOMAIN')
@@ -115,6 +134,40 @@ def configure(env):
     project = ROOT / 'project.godot'
     project.write_text(re.sub(r'^config/name=.*$', lambda _: 'config/name=' + title, project.read_text(), flags=re.M))
     preset = (ROOT / 'tools/export_presets.template').read_text().replace('@BUNDLE_ID@', env['BUNDLE_ID'])
+    options = {key: env.get(key, default) for key, (_, default) in EXPORT_OPTIONS.items()}
+    if not options['APP_BUILD_NUMBER'].isdigit() or int(options['APP_BUILD_NUMBER']) < 1:
+        raise ValueError('APP_BUILD_NUMBER must be a positive integer')
+    if not re.fullmatch(r'[0-9]+(?:\.[0-9]+){0,2}', options['APP_VERSION']):
+        raise ValueError('APP_VERSION must contain one to three numeric components')
+    assets = [k for k in options if k not in ('APP_VERSION', 'APP_BUILD_NUMBER', 'IOS_TEAM_ID')]
+    for key in assets:
+        value = options[key]
+        if not value:
+            continue
+        asset = (ROOT / value[6:]).resolve() if value.startswith('res://') else None
+        if asset is None or not asset.is_relative_to(ROOT) or not asset.is_file():
+            raise ValueError(f'{key} must reference an existing asset inside res://')
+    encode = lambda value: json.dumps(value, ensure_ascii=False)
+    text = project.read_text()
+    for key, setting in [('APP_ICON', 'config/icon'), ('BOOT_SPLASH_IMAGE', 'boot_splash/image')]:
+        line = setting + '=' + encode(options[key])
+        if re.search(r'^' + re.escape(setting) + r'=', text, re.M):
+            text = re.sub(r'^' + re.escape(setting) + r'=.*$', lambda _: line, text, flags=re.M)
+        elif options[key]:
+            text = text.replace('[application]\n', '[application]\n' + line + '\n')
+    if not options['APP_ICON'] and options['IOS_ICON']:
+        raise ValueError('Set APP_ICON as the shared icon fallback when using IOS_ICON')
+    project.write_text(text)
+    android, ios = [], []
+    for key, (setting, _) in EXPORT_OPTIONS.items():
+        if not setting:
+            continue
+        value = str(int(options[key])) if key == 'APP_BUILD_NUMBER' else encode(options[key])
+        (ios if key.startswith('IOS_') else android).append(setting + '=' + value)
+    ios += ['application/short_version=' + encode(options['APP_VERSION']),
+            'application/version=' + encode(options['APP_BUILD_NUMBER'])]
+    preset = preset.replace('@ANDROID_OPTIONS@', '\n'.join(android))
+    preset = preset.replace('@IOS_OPTIONS@', '\n'.join(ios))
     (ROOT / 'export_presets.cfg').write_text(preset)
     print('Configured client and mobile export presets (public values only).')
 
@@ -137,6 +190,13 @@ def godot_check(env):
             raise ValueError('Godot logged errors')
 
 
+def server_environment(env):
+    keys = (*SECRETS, 'COMPOSE_PROJECT_NAME', 'NAKAMA_IMAGE', 'POSTGRES_IMAGE',
+            'CADDY_IMAGE', 'LOG_LEVEL', 'LOCAL_BIND_IP', 'LOCAL_API_PORT',
+            'LOCAL_CONSOLE_PORT', 'API_DOMAIN', 'TLS_EMAIL')
+    return ''.join(f'{key}={env[key]}\n' for key in keys)
+
+
 def deploy(env, env_file):
     validate(env, production=True)
     build_server()
@@ -144,7 +204,7 @@ def deploy(env, env_file):
     compose(env_file, 'config', '--quiet', production=True)
     godot_check(env)
     target = f"{env['SSH_USER']}@{env['SSH_HOST']}"
-    ssh = ['ssh', '-p', env['SSH_PORT'], '-o', 'BatchMode=yes', target]
+    ssh = ['ssh', '-p', env['SSH_PORT'], '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes', target]
     dest = env['DEPLOY_PATH']
     # All interpolated remote values are validated and shell-quoted.
     qdest = shlex.quote(dest)
@@ -154,13 +214,17 @@ def deploy(env, env_file):
         with tarfile.open(archive, 'w:gz') as tar:
             for name in ('compose.yml', 'compose.production.yml', 'infra', 'server/modules'):
                 tar.add(ROOT / name, arcname=name)
-            tar.add(env_file, arcname='.env')
-        run(['scp', '-P', env['SSH_PORT'], '-o', 'BatchMode=yes', archive, f'{target}:{dest}/backend.tar.gz'])
+            server_env = Path(folder) / '.env'
+            server_env.write_text(server_environment(env))
+            server_env.chmod(0o600)
+            tar.add(server_env, arcname='.env')
+        archive.chmod(0o600)
+        run(['scp', '-P', env['SSH_PORT'], '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes', archive, f'{target}:{dest}/backend.tar.gz'])
     script = f'''set -eu
 cd {qdest}
 unset {' '.join(read_env(ROOT / '.env.example'))}
 umask 077
-if [ -f .env ]; then cp .env .env.previous; fi
+if [ -f .env ]; then cp .env .env.previous; chmod 600 .env.previous; fi
 tar -xzf backend.tar.gz
 rm backend.tar.gz
 rm -f server/modules/main.lua

@@ -3,6 +3,19 @@
 ## Goal
 Turn a game idea into a small playable mobile prototype. Preserve the working account, menu, settings, environment, and deployment foundation. Use KISS, DRY and YAGNI: use the official Nakama Godot SDK and TypeScript runtime. Avoid speculative abstractions, extra packages, generic event buses, or service layers.
 
+## Setup interviews and visual requirements
+
+Start onboarding at `docs/start-here.md`. Use the repo-local skill for the requested workflow; read its SKILL.md directly if skill discovery has not refreshed:
+
+- `.agents/skills/mobile-local-setup/SKILL.md`: first local run and prerequisites.
+- `.agents/skills/mobile-production-setup/SKILL.md`: secure VPS/SSH/production readiness.
+- `.agents/skills/mobile-android-export/SKILL.md`: Android tools, signing, assets and export.
+- `.agents/skills/mobile-ios-export/SKILL.md`: Xcode, provisioning, assets and export.
+
+Interview a few questions at a time, reuse existing answers, verify prerequisites, and keep redacted resumable notes under ignored `.setup/`. Read `docs/setup/interview-contract.md` for shared behavior. Do not turn an onboarding request into authorization to buy resources, change remote access, deploy or publish. Reuse explicit authorization already given.
+
+For every new visible game-art or UI-art task, read and invoke the available **imagegen** skill and follow `docs/setup/visual-assets.md`. Generate actual characters/objects/backgrounds, UI skins, icons and splash artwork; do not substitute primitive shapes, procedural drawing, emoji or default-widget-only visuals for the game's art direction. Native layout/controls, readable live text, collision shapes and hit regions remain code. Explicit user requests for geometric/vector/wireframe output override this rule. If imagegen is unavailable, continue non-art work and report the asset milestone blocked; do not silently draw a substitute. Copy selected assets into the repo before referencing them.
+
 ## Read first
 - `README.md` for commands and scope.
 - `docs/architecture.md` before changing player state or RPCs.
@@ -17,6 +30,7 @@ Turn a game idea into a small playable mobile prototype. Preserve the working ac
 - `client/core/preferences.gd`: device settings, Master audio, haptic preference.
 - `server/src/main.ts`: authenticated, validated, versioned server state transitions.
 - `addons/com.heroiclabs.nakama/`: pinned official Godot SDK; keep upstream code unmodified.
+- `tools/export.py`: Android APK / iOS project export with private signing environment.
 - `tools/manage.py`: config generation, local services, validation and SSH deployment.
 
 ## Rules
@@ -30,8 +44,8 @@ Turn a game idea into a small playable mobile prototype. Preserve the working ac
 - RPCs reject unknown fields and invalid types. Return a complete canonical snapshot after commit. Do not retry uncertain writes; reconcile by reading. Repeated rewards need an idempotent domain condition or durable receipt.
 - If changing schema version, add an explicit migration; never reset existing players silently.
 - All deployment/config values originate in the selected `.env` file. Only `api_url`, public `server_key`, and `game_title` enter `client/config.json`. Never package secrets or source `.env` as shell code.
-- `configure` owns title and export presets; edit `tools/export_presets.template`, not just generated presets.
-- Do not read secrets, change other game repositories, or touch real player saves for tests. Live tests use disposable accounts and restore their temporary session file.
+- `configure` owns public title/icon/splash and export metadata; edit `tools/export_presets.template`, not just generated presets.
+- Never print secrets or ask for them in chat; read them only inside the required validation/export/deploy tooling. Do not inspect unrelated secrets, change other game repositories, or touch real player saves for tests. Live tests use disposable accounts and restore their temporary session file.
 - Never use `docker compose down -v` without an explicit request to delete data.
 
 ## Validate
