@@ -1,9 +1,9 @@
 ---
 name: mobile-ios-export
-description: Interview a developer through macOS/Xcode prerequisites, Godot iOS export identity and signing, image-generated icons/launch art, device validation, and TestFlight/App Store preparation. Use for this starter's iOS export; do not treat export as publishing authorization.
+description: Interview a developer through macOS/Xcode prerequisites, Godot iOS export identity and signing, image-generated icons/launch art, device validation, and TestFlight/App Store preparation. Use for Mobile Game Starter's iOS export; do not treat export as publishing authorization.
 ---
 
-# iOS export interview
+# Mobile Game Starter: iOS export interview
 
 Read `AGENTS.md`, `docs/setup/interview-contract.md`, `docs/setup/visual-assets.md`, `docs/setup/security-variables.md`, and `docs/mobile.md`. Track `.setup/ios.md`. Invoke imagegen for actual visual asset work rather than making icons, splash art or UI skins from primitives.
 

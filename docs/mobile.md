@@ -1,4 +1,4 @@
-# Mobile workflow
+# Mobile Game Starter: Mobile workflow
 
 Start with the [Android interview](../.agents/skills/mobile-android-export/SKILL.md) or [iOS interview](../.agents/skills/mobile-ios-export/SKILL.md). They cover prerequisites, private signing, generated branding and device evidence a few questions at a time.
 

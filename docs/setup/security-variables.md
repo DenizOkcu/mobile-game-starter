@@ -1,4 +1,4 @@
-# Configuration and key ownership
+# Mobile Game Starter: Configuration and key ownership
 
 The setup skills use this table rather than inventing additional Nakama keys. `init` generates distinct URL-safe random values for all seven backend key/password fields, in a mode-0600 env file.
 

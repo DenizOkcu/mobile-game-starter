@@ -1,4 +1,4 @@
-# Image-generation-first visual production
+# Mobile Game Starter: Image-generation-first visual production
 
 This is a project requirement for future game work, including prototypes. Read and invoke the available **imagegen** skill before creating or replacing character art, world/game objects, inventory art, backgrounds, app icons, splash art, or the visual skin of menus/HUD/buttons/panels. Use its built-in image-generation tool by default. Respect its rules for editing, transparency, output files and fallback authorization.
 

@@ -1,4 +1,4 @@
-# Source project survey — 22 October 2026
+# Mobile Game Starter: Source project survey — 22 October 2026
 
 The development tree was searched for Godot projects, Unity manifests, Swift packages/Xcode projects, mobile exports, and Nakama/Compose manifests. Generated dependency trees, engine source, vendored addons, build caches and duplicate agent worktrees were excluded from the relevant project review. This is a survey of the game projects and their infrastructure, not a claim that every file in every unrelated development repository was read.
 

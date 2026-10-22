@@ -1,4 +1,4 @@
 interface:
   display_name: "Local development interview"
   short_description: "Set up local Godot and Nakama step by step"
-  default_prompt: "Use $mobile-local-setup to interview me and guide this setup, checking existing prerequisites first."
+  default_prompt: "Use $mobile-local-setup to interview me and guide Mobile Game Starter setup, checking existing prerequisites first."

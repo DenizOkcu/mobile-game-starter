@@ -1,4 +1,4 @@
-# Pinned dependencies
+# Mobile Game Starter: Pinned dependencies
 
 ## Official Nakama Godot SDK
 

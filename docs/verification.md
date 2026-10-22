@@ -1,4 +1,4 @@
-# Verification — 22 October 2026
+# Mobile Game Starter: Verification — 22 October 2026
 
 Completed on macOS with Godot 4.7.2 and the real Nakama 3.41.0 / PostgreSQL 17 Docker stack:
 

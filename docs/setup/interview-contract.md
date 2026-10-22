@@ -1,4 +1,4 @@
-# Shared setup interview contract
+# Mobile Game Starter: Shared setup interview contract
 
 Read this with the selected repo skill. Paths and commands are relative to the repository root, irrespective of the skill directory.
 

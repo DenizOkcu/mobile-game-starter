@@ -1,4 +1,4 @@
-# VPS deployment
+# Mobile Game Starter: VPS deployment
 
 Start with the [production interview skill](../.agents/skills/mobile-production-setup/SKILL.md) for host, SSH, firewall, secrets and recovery gates. The script alone does not audit or harden a VPS.
 

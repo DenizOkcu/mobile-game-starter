@@ -1,6 +1,6 @@
-# Godot + Nakama mobile starter
+# Mobile Game Starter
 
-A small starting point for mobile prototypes and LLM-assisted development. Godot 4.7.2, typed GDScript, Nakama TypeScript, PostgreSQL, Docker Compose, and a stdlib-only Python command runner. Uses the pinned official Nakama Godot SDK. The backend compiles with TypeScript directly, without a bundler.
+Mobile Game Starter is a small starting point for mobile prototypes and LLM-assisted development. Godot 4.7.2, typed GDScript, Nakama TypeScript, PostgreSQL, Docker Compose, and a stdlib-only Python command runner. Uses the pinned official Nakama Godot SDK. The backend compiles with TypeScript directly, without a bundler.
 
 Includes explicit guest access, email registration/login, guest-to-email linking, refresh-token restore, logout, account deletion, a main menu, account/profile screen, persistent volume/haptics/reduced-motion settings, and a replaceable game scene. A server-owned player record and once-only tutorial reward demonstrate the complete client → intent → database → canonical snapshot loop.
 

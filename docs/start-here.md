@@ -1,8 +1,8 @@
-# Start here with your coding assistant
+# Mobile Game Starter: Start here with your coding assistant
 
 Open this repository in your coding assistant and say:
 
-> Help me get this game starter running locally. Use the mobile-local-setup skill, interview me a few questions at a time, check existing tools first, and guide me until the Godot game talks to local Nakama.
+> Help me get Mobile Game Starter running locally. Use the mobile-local-setup skill, interview me a few questions at a time, check existing tools first, and guide me until the Godot game talks to local Nakama.
 
 The four skills live in `.agents/skills/` so they travel with every new game. An assistant that discovers repo skills can invoke `$mobile-local-setup`, `$mobile-production-setup`, `$mobile-android-export`, or `$mobile-ios-export`. If your assistant has not refreshed skill discovery, tell it to read the corresponding `SKILL.md` directly; the workflow is identical. No global installation or absolute user-specific path is required.
 

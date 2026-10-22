@@ -1,4 +1,4 @@
-# Give this to your coding agent
+# Mobile Game Starter: Give this to your coding agent
 
 > Read AGENTS.md, README.md and docs/architecture.md. My game idea is: **[idea]**.
 >
@@ -8,4 +8,4 @@
 >
 > If prerequisites are missing, use the repo-local local-development interview skill and ask a few questions at a time. Run check and the relevant integration tests, update the README with controls and changes, and report remaining device/deployment checks. Do not deploy to production unless requested.
 
-For a separate game repository, copy this starter without `.git`, `.env*` (retain `.env.example`), `.godot`, `client/config.json`, `exports`, `backups`, `node_modules`, compiled server modules, or `.setup`; run `git init -b main`, then `python3 tools/manage.py init`. Give it its own COMPOSE_PROJECT_NAME, GAME_TITLE, BUNDLE_ID, ports, VPS path, domain and secrets. Existing game repositories are references, not dependencies.
+For a separate game repository, copy Mobile Game Starter without `.git`, `.env*` (retain `.env.example`), `.godot`, `client/config.json`, `exports`, `backups`, `node_modules`, compiled server modules, or `.setup`; run `git init -b main`, then `python3 tools/manage.py init`. Give it its own COMPOSE_PROJECT_NAME, GAME_TITLE, BUNDLE_ID, ports, VPS path, domain and secrets. Existing game repositories are references, not dependencies.

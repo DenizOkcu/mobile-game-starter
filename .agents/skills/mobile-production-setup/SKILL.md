@@ -1,9 +1,9 @@
 ---
 name: mobile-production-setup
-description: Interview and guide secure VPS preparation and SSH-key deployment of this starter's Nakama stack, including DigitalOcean Docker Droplets, firewall evidence, isolated production secrets, TLS, backups and recovery gates. Use for first deployment or production readiness, not local-only setup.
+description: Interview and guide secure VPS preparation and SSH-key deployment of Mobile Game Starter's Nakama stack, including DigitalOcean Docker Droplets, firewall evidence, isolated production secrets, TLS, backups and recovery gates. Use for first deployment or production readiness, not local-only setup.
 ---
 
-# Secure production setup interview
+# Mobile Game Starter: Secure production setup interview
 
 Read `AGENTS.md`, `docs/setup/interview-contract.md`, `docs/setup/security-variables.md`, and `docs/deployment.md`. Track redacted evidence in `.setup/production.md`. This workflow prepares actual readiness; it never infers authorization for paid provisioning or remote changes from a general request for advice.
 

@@ -1,4 +1,4 @@
-# Architecture and contracts
+# Mobile Game Starter: Architecture and contracts
 
 The client is a Godot project at the repo root. The official Nakama SDK autoload plus three application autoloads cover public configuration, device preferences, and Nakama transport/session state. One UI controller owns navigation and disables input during async actions. The game scene emits intents without knowing transport details. Avoid adding another facade until a game needs one.
 

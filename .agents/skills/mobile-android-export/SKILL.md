@@ -1,9 +1,9 @@
 ---
 name: mobile-android-export
-description: Interview a developer through Godot Android SDK/JDK prerequisites, device or emulator testing, env-driven identity/signing, image-generated icons/splash, and APK/AAB release preparation. Use for this starter's Android exports, not iOS or publishing without authorization.
+description: Interview a developer through Godot Android SDK/JDK prerequisites, device or emulator testing, env-driven identity/signing, image-generated icons/splash, and APK/AAB release preparation. Use for Mobile Game Starter's Android exports, not iOS or publishing without authorization.
 ---
 
-# Android export interview
+# Mobile Game Starter: Android export interview
 
 Read `AGENTS.md`, `docs/setup/interview-contract.md`, `docs/setup/visual-assets.md`, `docs/setup/security-variables.md`, and `docs/mobile.md`. Keep notes in `.setup/android.md`. Use the imagegen skill for the actual branding/UI artwork; this workflow is not satisfied by geometric placeholder icons.
 

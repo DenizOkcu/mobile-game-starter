@@ -1,9 +1,9 @@
 ---
 name: mobile-local-setup
-description: Interview a developer through prerequisites, env setup, Docker Compose, and the first playable local Godot/Nakama run in this starter. Use for first-run or resumed local onboarding, not VPS deployment or store export.
+description: Interview a developer through prerequisites, env setup, Docker Compose, and the first playable local Godot/Nakama run in Mobile Game Starter. Use for first-run or resumed local onboarding, not VPS deployment or store export.
 ---
 
-# Local development interview
+# Mobile Game Starter: Local development interview
 
 Read `AGENTS.md`, `docs/setup/interview-contract.md`, and `docs/setup/security-variables.md` from the repository root. Keep interview state in `.setup/local.md`. Read `docs/setup/visual-assets.md` when the user moves from infrastructure to game/branding work.
 

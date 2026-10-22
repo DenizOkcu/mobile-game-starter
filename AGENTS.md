@@ -1,4 +1,4 @@
-# Working in this starter
+# Working in Mobile Game Starter
 
 ## Goal
 Turn a game idea into a small playable mobile prototype. Preserve the working account, menu, settings, environment, and deployment foundation. Use KISS, DRY and YAGNI: use the official Nakama Godot SDK and TypeScript runtime. Avoid speculative abstractions, extra packages, generic event buses, or service layers.
