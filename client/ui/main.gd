@@ -90,7 +90,8 @@ func _update_player_summary() -> void:
 	if not is_instance_valid(player_summary):
 		return
 	player_summary.visible = Backend.state_ready and not Backend.token.is_empty()
-	player_summary.text = "%s · %d coins" % [Backend.state.get("display_name", "Player"), Backend.state.get("coins", 0)]
+	var name: String = Backend.account.get("display_name", "")
+	player_summary.text = "%s · %d coins" % [name if not name.is_empty() else "Player", Backend.state.get("coins", 0)]
 
 func _auth() -> void:
 	_label("Start a prototype", 32)
@@ -141,7 +142,7 @@ func _settings() -> void:
 func _account() -> void:
 	_label("Account", 32)
 	var display_name := _field("Display name · ASCII, up to 24 characters")
-	display_name.text = Backend.state.get("display_name", "Player")
+	display_name.text = Backend.account.get("display_name", "")
 	display_name.max_length = 24
 	_button("Save name", func() -> void: _run(Backend.call_rpc.bind("update_profile", {"display_name": display_name.text}), "account"))
 	_label("Link email to keep your guest progress on other devices.")

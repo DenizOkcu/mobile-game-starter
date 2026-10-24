@@ -2,6 +2,7 @@ extends Node
 
 signal state_changed
 var state: Dictionary = {}
+var account: Dictionary = {}
 var state_ready: bool = false
 var last_error: String = ""
 var _client: NakamaClient
@@ -56,6 +57,7 @@ func _accept(reply: NakamaSession, reset_state: bool = false) -> bool:
 	var invalidate_state := reset_state or _session == null or _session.user_id != reply.user_id
 	if invalidate_state:
 		state = {}
+		account = {}
 		state_ready = false
 	_session = reply
 	_persist()
@@ -80,6 +82,7 @@ func restore() -> bool:
 	if refresh_token.is_empty():
 		return false
 	state = {}
+	account = {}
 	state_ready = false
 	_session = NakamaSession.new(null, false, refresh_token)
 	state_changed.emit()
@@ -150,10 +153,11 @@ func call_rpc(id: String, payload: Dictionary = {}) -> bool:
 	if not _check(reply):
 		return false
 	var decoded: Variant = JSON.parse_string(reply.get("payload"))
-	if not decoded is Dictionary or not decoded.get("state") is Dictionary or decoded.state.is_empty():
+	if not decoded is Dictionary or not decoded.get("state") is Dictionary or decoded.state.is_empty() or not decoded.get("account") is Dictionary or not decoded.account.get("display_name") is String:
 		last_error = "Invalid server snapshot."
 		return false
 	state = decoded.state
+	account = decoded.account
 	state_ready = true
 	state_changed.emit()
 	return true
@@ -181,6 +185,7 @@ func delete_account() -> bool:
 func clear_session() -> void:
 	_session = null
 	state = {}
+	account = {}
 	state_ready = false
 	_clear_persisted_session()
 	state_changed.emit()

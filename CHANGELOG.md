@@ -2,7 +2,10 @@
 
 Framework versions are independent of game app versions and player-state schema versions.
 
-## Unreleased
+## 0.1.2
+
+- Use the native Nakama account display name instead of duplicating it in progression. Duplicate display names are allowed; unique usernames remain unchanged. Add migration, account-boundary, UI interaction and live API regression coverage.
+- Double the desktop debug window from 360×640 to 720×1280 while preserving the design viewport and stretch mode.
 
 - Run a headless Godot import during `up` so freshly cloned games can launch directly. Without an editor pass first, the missing `.godot` cache left the vendored SDK's classes unregistered and direct launches failed with a gray screen.
 - Drive SDD through LLM chat actions with thin `/sdd` adapters for Claude Code/Cursor and the shared Codex skill. Agents handle installation and verification; document each client’s supported entry point.
@@ -16,7 +19,13 @@ Framework versions are independent of game app versions and player-state schema 
 - Recover refresh-only sessions after offline startup through resume and an explicit Retry connection action, preserving the original account.
 - Enforce 48×48 logical-unit native hit targets across viewport/display scaling, including small layouts and confirmation controls. Update the agent and device acceptance guidance accordingly.
 
-No server RPC, player schema, database, env or dependency migration is required. Existing games should adopt the controller/helper changes and review their custom touch regions. Framework update resolutions from older pending state require the explicit manual review step described in the upgrade guide.
+### Upgrade from 0.1.1
+
+**Snapshot compatibility change:** release the matching client and server together. RPC snapshots now expose `account.display_name`, not `state.display_name`. Keep the RPC IDs and existing name validation. Nakama display names are not unique, so no taken-name error applies.
+
+Player progression migrates explicitly from schema 1 to schema 2 on first load. The old name moves to an empty native account name; an existing native name takes precedence. A version-checked transaction removes the progression copy while preserving rewards, progress and timestamps. Back up the database before deployment. After migration, reverting to a schema-1-only runtime is not a safe rollback: use a schema-2-compatible runtime or an explicit reverse migration. Custom games must adapt this migration to their own schema; never replace custom player state with the starter schema.
+
+No SQL database or env migration is required. Existing games should adopt the controller/helper changes and review their custom touch regions. Framework update resolutions from older pending state require the explicit manual review step described in the upgrade guide. Review the OpenSpec first-adoption and Node.js requirements above. Signed exports, physical-device checks and production deployment remain separate from local validation.
 
 ## 0.1.1
 
