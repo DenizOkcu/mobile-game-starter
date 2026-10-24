@@ -62,7 +62,8 @@ try {
         case 'status': compose(envFile, ['ps']); break;
         case 'check':
           buildServer(); configure(env);
-          run(process.execPath, ['--test', path.join(ROOT, 'tests/tooling.test.mjs'), path.join(ROOT, 'tests/framework-update.test.mjs')]);
+          run(process.execPath, [path.join(ROOT, 'tools/nakama-reference.mjs'), '--check']);
+          run(process.execPath, ['--test', path.join(ROOT, 'tests/tooling.test.mjs'), path.join(ROOT, 'tests/framework-update.test.mjs'), path.join(ROOT, 'tests/nakama-reference.test.mjs')]);
           compose(envFile, ['config', '--quiet']); compose(envFile, ['config', '--quiet'], { production: true });
           run('bash', ['-n', path.join(ROOT, 'infra/deploy-remote.sh')]); godotCheck(env); break;
         case 'smoke': {

@@ -1,0 +1,1480 @@
+{
+  "format": 1,
+  "version": "3.41.0",
+  "commit": "cab8af584947ff0d7ebee91d6c33e67d87fd3e47",
+  "sources": {
+    "runtime_javascript_nakama.go": "12f57eb508fdb145704423aac39b4a10653b97f15e1ab946c9548bb7d8270371",
+    "runtime_javascript_init.go": "e3a632df53617a1c2b9a91b84484040ed4864c6d95699d6aba3f32120572e9d1",
+    "runtime_javascript_match_core.go": "7429e89e16fbeb7c10610ec636e97704828852e7551958cd980178843a7eeba5"
+  },
+  "Nakama": {
+    "event": [
+      "runtime_javascript_nakama.go",
+      561
+    ],
+    "metricsCounterAdd": [
+      "runtime_javascript_nakama.go",
+      595
+    ],
+    "metricsGaugeSet": [
+      "runtime_javascript_nakama.go",
+      611
+    ],
+    "metricsTimerRecord": [
+      "runtime_javascript_nakama.go",
+      627
+    ],
+    "uuidv4": [
+      "runtime_javascript_nakama.go",
+      642
+    ],
+    "cronPrev": [
+      "runtime_javascript_nakama.go",
+      678
+    ],
+    "cronNext": [
+      "runtime_javascript_nakama.go",
+      654
+    ],
+    "sqlExec": [
+      "runtime_javascript_nakama.go",
+      702
+    ],
+    "sqlQuery": [
+      "runtime_javascript_nakama.go",
+      743
+    ],
+    "httpRequest": [
+      "runtime_javascript_nakama.go",
+      816
+    ],
+    "base64Encode": [
+      "runtime_javascript_nakama.go",
+      913
+    ],
+    "base64Decode": [
+      "runtime_javascript_nakama.go",
+      950
+    ],
+    "base64UrlEncode": [
+      "runtime_javascript_nakama.go",
+      979
+    ],
+    "base64UrlDecode": [
+      "runtime_javascript_nakama.go",
+      1016
+    ],
+    "base16Encode": [
+      "runtime_javascript_nakama.go",
+      1044
+    ],
+    "base16Decode": [
+      "runtime_javascript_nakama.go",
+      1070
+    ],
+    "jwtGenerate": [
+      "runtime_javascript_nakama.go",
+      1089
+    ],
+    "aes128Encrypt": [
+      "runtime_javascript_nakama.go",
+      1152
+    ],
+    "aes128Decrypt": [
+      "runtime_javascript_nakama.go",
+      1172
+    ],
+    "aes256Encrypt": [
+      "runtime_javascript_nakama.go",
+      1192
+    ],
+    "aes256Decrypt": [
+      "runtime_javascript_nakama.go",
+      1212
+    ],
+    "md5Hash": [
+      "runtime_javascript_nakama.go",
+      1296
+    ],
+    "sha256Hash": [
+      "runtime_javascript_nakama.go",
+      1311
+    ],
+    "hmacSha256Hash": [
+      "runtime_javascript_nakama.go",
+      1360
+    ],
+    "rsaSha256Hash": [
+      "runtime_javascript_nakama.go",
+      1327
+    ],
+    "bcryptHash": [
+      "runtime_javascript_nakama.go",
+      1383
+    ],
+    "bcryptCompare": [
+      "runtime_javascript_nakama.go",
+      1401
+    ],
+    "authenticate": [
+      "runtime_javascript_nakama.go",
+      1891
+    ],
+    "authenticateApple": [
+      "runtime_javascript_nakama.go",
+      1434
+    ],
+    "authenticateCustom": [
+      "runtime_javascript_nakama.go",
+      1485
+    ],
+    "authenticateDevice": [
+      "runtime_javascript_nakama.go",
+      1536
+    ],
+    "authenticateEmail": [
+      "runtime_javascript_nakama.go",
+      1588
+    ],
+    "authenticateFacebook": [
+      "runtime_javascript_nakama.go",
+      1666
+    ],
+    "authenticateFacebookInstantGame": [
+      "runtime_javascript_nakama.go",
+      1723
+    ],
+    "authenticateGameCenter": [
+      "runtime_javascript_nakama.go",
+      1775
+    ],
+    "authenticateGoogle": [
+      "runtime_javascript_nakama.go",
+      1842
+    ],
+    "authenticateSteam": [
+      "runtime_javascript_nakama.go",
+      1955
+    ],
+    "authenticateTokenGenerate": [
+      "runtime_javascript_nakama.go",
+      2017
+    ],
+    "accountGetId": [
+      "runtime_javascript_nakama.go",
+      2065
+    ],
+    "accountsGetId": [
+      "runtime_javascript_nakama.go",
+      2096
+    ],
+    "accountUpdateId": [
+      "runtime_javascript_nakama.go",
+      2151
+    ],
+    "accountDeleteId": [
+      "runtime_javascript_nakama.go",
+      2223
+    ],
+    "accountExportId": [
+      "runtime_javascript_nakama.go",
+      2248
+    ],
+    "accountImportId": [
+      "runtime_javascript_nakama.go",
+      2275
+    ],
+    "usersGetId": [
+      "runtime_javascript_nakama.go",
+      2327
+    ],
+    "usersGetUsername": [
+      "runtime_javascript_nakama.go",
+      2381
+    ],
+    "usersGetFriendStatus": [
+      "runtime_javascript_nakama.go",
+      2417
+    ],
+    "usersGetRandom": [
+      "runtime_javascript_nakama.go",
+      2477
+    ],
+    "usersBanId": [
+      "runtime_javascript_nakama.go",
+      2507
+    ],
+    "usersUnbanId": [
+      "runtime_javascript_nakama.go",
+      2540
+    ],
+    "link": [
+      "runtime_javascript_nakama.go",
+      2601
+    ],
+    "linkApple": [
+      "runtime_javascript_nakama.go",
+      2574
+    ],
+    "linkCustom": [
+      "runtime_javascript_nakama.go",
+      2663
+    ],
+    "linkDevice": [
+      "runtime_javascript_nakama.go",
+      2689
+    ],
+    "linkEmail": [
+      "runtime_javascript_nakama.go",
+      2716
+    ],
+    "linkFacebook": [
+      "runtime_javascript_nakama.go",
+      2748
+    ],
+    "linkFacebookInstantGame": [
+      "runtime_javascript_nakama.go",
+      2782
+    ],
+    "linkGameCenter": [
+      "runtime_javascript_nakama.go",
+      2813
+    ],
+    "linkGoogle": [
+      "runtime_javascript_nakama.go",
+      2859
+    ],
+    "linkSteam": [
+      "runtime_javascript_nakama.go",
+      2887
+    ],
+    "unlink": [
+      "runtime_javascript_nakama.go",
+      2637
+    ],
+    "unlinkApple": [
+      "runtime_javascript_nakama.go",
+      2921
+    ],
+    "unlinkCustom": [
+      "runtime_javascript_nakama.go",
+      2947
+    ],
+    "unlinkDevice": [
+      "runtime_javascript_nakama.go",
+      2973
+    ],
+    "unlinkEmail": [
+      "runtime_javascript_nakama.go",
+      2999
+    ],
+    "unlinkFacebook": [
+      "runtime_javascript_nakama.go",
+      3025
+    ],
+    "unlinkFacebookInstantGame": [
+      "runtime_javascript_nakama.go",
+      3051
+    ],
+    "unlinkGameCenter": [
+      "runtime_javascript_nakama.go",
+      3082
+    ],
+    "unlinkGoogle": [
+      "runtime_javascript_nakama.go",
+      3128
+    ],
+    "unlinkSteam": [
+      "runtime_javascript_nakama.go",
+      3154
+    ],
+    "streamUserList": [
+      "runtime_javascript_nakama.go",
+      3182
+    ],
+    "streamUserGet": [
+      "runtime_javascript_nakama.go",
+      3229
+    ],
+    "streamUserJoin": [
+      "runtime_javascript_nakama.go",
+      3284
+    ],
+    "streamUserUpdate": [
+      "runtime_javascript_nakama.go",
+      3355
+    ],
+    "streamUserLeave": [
+      "runtime_javascript_nakama.go",
+      3423
+    ],
+    "streamUserKick": [
+      "runtime_javascript_nakama.go",
+      3467
+    ],
+    "streamCount": [
+      "runtime_javascript_nakama.go",
+      3545
+    ],
+    "streamClose": [
+      "runtime_javascript_nakama.go",
+      3568
+    ],
+    "streamSend": [
+      "runtime_javascript_nakama.go",
+      3594
+    ],
+    "streamSendRaw": [
+      "runtime_javascript_nakama.go",
+      3690
+    ],
+    "sessionDisconnect": [
+      "runtime_javascript_nakama.go",
+      3778
+    ],
+    "sessionLogout": [
+      "runtime_javascript_nakama.go",
+      3812
+    ],
+    "matchCreate": [
+      "runtime_javascript_nakama.go",
+      3857
+    ],
+    "matchGet": [
+      "runtime_javascript_nakama.go",
+      3890
+    ],
+    "matchList": [
+      "runtime_javascript_nakama.go",
+      3928
+    ],
+    "matchSignal": [
+      "runtime_javascript_nakama.go",
+      3992
+    ],
+    "notificationSend": [
+      "runtime_javascript_nakama.go",
+      4018
+    ],
+    "notificationSendAll": [
+      "runtime_javascript_nakama.go",
+      4275
+    ],
+    "notificationsList": [
+      "runtime_javascript_nakama.go",
+      4093
+    ],
+    "notificationsSend": [
+      "runtime_javascript_nakama.go",
+      4156
+    ],
+    "notificationsDelete": [
+      "runtime_javascript_nakama.go",
+      4331
+    ],
+    "notificationsUpdate": [
+      "runtime_javascript_nakama.go",
+      4393
+    ],
+    "notificationsGetId": [
+      "runtime_javascript_nakama.go",
+      4463
+    ],
+    "notificationsDeleteId": [
+      "runtime_javascript_nakama.go",
+      4522
+    ],
+    "walletUpdate": [
+      "runtime_javascript_nakama.go",
+      4566
+    ],
+    "walletsUpdate": [
+      "runtime_javascript_nakama.go",
+      4635
+    ],
+    "walletLedgerUpdate": [
+      "runtime_javascript_nakama.go",
+      4726
+    ],
+    "walletLedgerList": [
+      "runtime_javascript_nakama.go",
+      4849
+    ],
+    "statusFollow": [
+      "runtime_javascript_nakama.go",
+      4767
+    ],
+    "statusUnfollow": [
+      "runtime_javascript_nakama.go",
+      4807
+    ],
+    "storageList": [
+      "runtime_javascript_nakama.go",
+      4910
+    ],
+    "storageRead": [
+      "runtime_javascript_nakama.go",
+      5000
+    ],
+    "storageWrite": [
+      "runtime_javascript_nakama.go",
+      5101
+    ],
+    "storageWriteRetry": [
+      "runtime_javascript_nakama.go",
+      5145
+    ],
+    "storageDelete": [
+      "runtime_javascript_nakama.go",
+      5494
+    ],
+    "multiUpdate": [
+      "runtime_javascript_nakama.go",
+      5585
+    ],
+    "leaderboardCreate": [
+      "runtime_javascript_nakama.go",
+      5971
+    ],
+    "leaderboardDelete": [
+      "runtime_javascript_nakama.go",
+      6062
+    ],
+    "leaderboardList": [
+      "runtime_javascript_nakama.go",
+      6084
+    ],
+    "leaderboardRanksDisable": [
+      "runtime_javascript_nakama.go",
+      6140
+    ],
+    "leaderboardRecordsList": [
+      "runtime_javascript_nakama.go",
+      6164
+    ],
+    "leaderboardRecordsListCursorFromRank": [
+      "runtime_javascript_nakama.go",
+      6222
+    ],
+    "leaderboardRecordWrite": [
+      "runtime_javascript_nakama.go",
+      6291
+    ],
+    "leaderboardRecordDelete": [
+      "runtime_javascript_nakama.go",
+      6363
+    ],
+    "leaderboardsGetId": [
+      "runtime_javascript_nakama.go",
+      6388
+    ],
+    "leaderboardRecordsHaystack": [
+      "runtime_javascript_nakama.go",
+      6424
+    ],
+    "purchaseValidateApple": [
+      "runtime_javascript_nakama.go",
+      6472
+    ],
+    "purchaseValidateGoogle": [
+      "runtime_javascript_nakama.go",
+      6518
+    ],
+    "purchaseValidateHuawei": [
+      "runtime_javascript_nakama.go",
+      6572
+    ],
+    "purchaseValidateFacebookInstant": [
+      "runtime_javascript_nakama.go",
+      6622
+    ],
+    "purchaseValidateSamsung": [
+      "runtime_javascript_nakama.go",
+      6665
+    ],
+    "purchaseGetByTransactionId": [
+      "runtime_javascript_nakama.go",
+      6702
+    ],
+    "purchasesList": [
+      "runtime_javascript_nakama.go",
+      6725
+    ],
+    "subscriptionValidateApple": [
+      "runtime_javascript_nakama.go",
+      6784
+    ],
+    "subscriptionValidateGoogle": [
+      "runtime_javascript_nakama.go",
+      6830
+    ],
+    "subscriptionGetByProductId": [
+      "runtime_javascript_nakama.go",
+      6887
+    ],
+    "subscriptionsList": [
+      "runtime_javascript_nakama.go",
+      6919
+    ],
+    "tournamentCreate": [
+      "runtime_javascript_nakama.go",
+      6989
+    ],
+    "tournamentDelete": [
+      "runtime_javascript_nakama.go",
+      7137
+    ],
+    "tournamentAddAttempt": [
+      "runtime_javascript_nakama.go",
+      7158
+    ],
+    "tournamentJoin": [
+      "runtime_javascript_nakama.go",
+      7191
+    ],
+    "tournamentList": [
+      "runtime_javascript_nakama.go",
+      7397
+    ],
+    "tournamentsRanksDisable": [
+      "runtime_javascript_nakama.go",
+      7493
+    ],
+    "tournamentsGetId": [
+      "runtime_javascript_nakama.go",
+      7225
+    ],
+    "tournamentRecordsList": [
+      "runtime_javascript_nakama.go",
+      7271
+    ],
+    "tournamentRecordWrite": [
+      "runtime_javascript_nakama.go",
+      7517
+    ],
+    "tournamentRecordDelete": [
+      "runtime_javascript_nakama.go",
+      7582
+    ],
+    "tournamentRecordsHaystack": [
+      "runtime_javascript_nakama.go",
+      7611
+    ],
+    "groupsGetId": [
+      "runtime_javascript_nakama.go",
+      7659
+    ],
+    "groupCreate": [
+      "runtime_javascript_nakama.go",
+      7717
+    ],
+    "groupUpdate": [
+      "runtime_javascript_nakama.go",
+      7826
+    ],
+    "groupDelete": [
+      "runtime_javascript_nakama.go",
+      7912
+    ],
+    "groupUsersKick": [
+      "runtime_javascript_nakama.go",
+      7934
+    ],
+    "groupUsersList": [
+      "runtime_javascript_nakama.go",
+      7989
+    ],
+    "userGroupsList": [
+      "runtime_javascript_nakama.go",
+      8098
+    ],
+    "friendsList": [
+      "runtime_javascript_nakama.go",
+      8189
+    ],
+    "friendsOfFriendsList": [
+      "runtime_javascript_nakama.go",
+      8269
+    ],
+    "friendsAdd": [
+      "runtime_javascript_nakama.go",
+      8331
+    ],
+    "friendsDelete": [
+      "runtime_javascript_nakama.go",
+      8426
+    ],
+    "friendsBlock": [
+      "runtime_javascript_nakama.go",
+      8505
+    ],
+    "friendMetadataUpdate": [
+      "runtime_javascript_nakama.go",
+      8584
+    ],
+    "groupUserJoin": [
+      "runtime_javascript_nakama.go",
+      8615
+    ],
+    "groupUserLeave": [
+      "runtime_javascript_nakama.go",
+      8654
+    ],
+    "groupUsersAdd": [
+      "runtime_javascript_nakama.go",
+      8693
+    ],
+    "groupUsersBan": [
+      "runtime_javascript_nakama.go",
+      8752
+    ],
+    "groupUsersPromote": [
+      "runtime_javascript_nakama.go",
+      8811
+    ],
+    "groupUsersDemote": [
+      "runtime_javascript_nakama.go",
+      8870
+    ],
+    "groupsList": [
+      "runtime_javascript_nakama.go",
+      8934
+    ],
+    "groupsGetRandom": [
+      "runtime_javascript_nakama.go",
+      9003
+    ],
+    "fileRead": [
+      "runtime_javascript_nakama.go",
+      9034
+    ],
+    "localcacheGet": [
+      "runtime_javascript_nakama.go",
+      9058
+    ],
+    "localcachePut": [
+      "runtime_javascript_nakama.go",
+      9079
+    ],
+    "localcacheDelete": [
+      "runtime_javascript_nakama.go",
+      9114
+    ],
+    "localcacheClear": [
+      "runtime_javascript_nakama.go",
+      9127
+    ],
+    "channelMessageSend": [
+      "runtime_javascript_nakama.go",
+      9144
+    ],
+    "channelMessageUpdate": [
+      "runtime_javascript_nakama.go",
+      9217
+    ],
+    "channelMessageRemove": [
+      "runtime_javascript_nakama.go",
+      9294
+    ],
+    "channelMessagesList": [
+      "runtime_javascript_nakama.go",
+      9354
+    ],
+    "channelIdBuild": [
+      "runtime_javascript_nakama.go",
+      9422
+    ],
+    "binaryToString": [
+      "runtime_javascript_nakama.go",
+      333
+    ],
+    "stringToBinary": [
+      "runtime_javascript_nakama.go",
+      357
+    ],
+    "storageIndexList": [
+      "runtime_javascript_nakama.go",
+      382
+    ],
+    "partyList": [
+      "runtime_javascript_nakama.go",
+      471
+    ],
+    "secureRandomBytes": [
+      "runtime_javascript_nakama.go",
+      531
+    ],
+    "getSatori": [
+      "runtime_javascript_nakama.go",
+      9487
+    ]
+  },
+  "Initializer": {
+    "getConfig": [
+      "runtime_javascript_init.go",
+      306
+    ],
+    "registerRpc": [
+      "runtime_javascript_init.go",
+      409
+    ],
+    "registerAuthenticateProvider": [
+      "runtime_javascript_init.go",
+      442
+    ],
+    "registerRtBefore": [
+      "runtime_javascript_init.go",
+      1418
+    ],
+    "registerRtAfter": [
+      "runtime_javascript_init.go",
+      1454
+    ],
+    "registerMatchmakerMatched": [
+      "runtime_javascript_init.go",
+      1544
+    ],
+    "registerTournamentEnd": [
+      "runtime_javascript_init.go",
+      1567
+    ],
+    "registerTournamentReset": [
+      "runtime_javascript_init.go",
+      1590
+    ],
+    "registerLeaderboardReset": [
+      "runtime_javascript_init.go",
+      1613
+    ],
+    "registerShutdown": [
+      "runtime_javascript_init.go",
+      1636
+    ],
+    "registerPurchaseNotificationApple": [
+      "runtime_javascript_init.go",
+      1659
+    ],
+    "registerSubscriptionNotificationApple": [
+      "runtime_javascript_init.go",
+      1682
+    ],
+    "registerPurchaseNotificationGoogle": [
+      "runtime_javascript_init.go",
+      1705
+    ],
+    "registerSubscriptionNotificationGoogle": [
+      "runtime_javascript_init.go",
+      1728
+    ],
+    "registerMatch": [
+      "runtime_javascript_init.go",
+      1751
+    ],
+    "registerBeforeGetAccount": [
+      "runtime_javascript_init.go",
+      567
+    ],
+    "registerAfterGetAccount": [
+      "runtime_javascript_init.go",
+      571
+    ],
+    "registerBeforeGetMatchmakerStats": [
+      "runtime_javascript_init.go",
+      575
+    ],
+    "registerAfterGetMatchmakerStats": [
+      "runtime_javascript_init.go",
+      579
+    ],
+    "registerBeforeUpdateAccount": [
+      "runtime_javascript_init.go",
+      583
+    ],
+    "registerAfterUpdateAccount": [
+      "runtime_javascript_init.go",
+      587
+    ],
+    "registerBeforeDeleteAccount": [
+      "runtime_javascript_init.go",
+      591
+    ],
+    "registerAfterDeleteAccount": [
+      "runtime_javascript_init.go",
+      595
+    ],
+    "registerBeforeAuthenticateApple": [
+      "runtime_javascript_init.go",
+      599
+    ],
+    "registerAfterAuthenticateApple": [
+      "runtime_javascript_init.go",
+      603
+    ],
+    "registerBeforeAuthenticateCustom": [
+      "runtime_javascript_init.go",
+      607
+    ],
+    "registerAfterAuthenticateCustom": [
+      "runtime_javascript_init.go",
+      611
+    ],
+    "registerBeforeAuthenticateDevice": [
+      "runtime_javascript_init.go",
+      615
+    ],
+    "registerAfterAuthenticateDevice": [
+      "runtime_javascript_init.go",
+      619
+    ],
+    "registerBeforeAuthenticateEmail": [
+      "runtime_javascript_init.go",
+      623
+    ],
+    "registerAfterAuthenticateEmail": [
+      "runtime_javascript_init.go",
+      627
+    ],
+    "registerBeforeAuthenticateFacebook": [
+      "runtime_javascript_init.go",
+      631
+    ],
+    "registerAfterAuthenticateFacebook": [
+      "runtime_javascript_init.go",
+      635
+    ],
+    "registerBeforeAuthenticateFacebookInstantGame": [
+      "runtime_javascript_init.go",
+      639
+    ],
+    "registerAfterAuthenticateFacebookInstantGame": [
+      "runtime_javascript_init.go",
+      643
+    ],
+    "registerBeforeAuthenticateGameCenter": [
+      "runtime_javascript_init.go",
+      647
+    ],
+    "registerAfterAuthenticateGameCenter": [
+      "runtime_javascript_init.go",
+      651
+    ],
+    "registerBeforeAuthenticateGoogle": [
+      "runtime_javascript_init.go",
+      655
+    ],
+    "registerAfterAuthenticateGoogle": [
+      "runtime_javascript_init.go",
+      659
+    ],
+    "registerBeforeAuthenticate": [
+      "runtime_javascript_init.go",
+      663
+    ],
+    "registerAfterAuthenticate": [
+      "runtime_javascript_init.go",
+      667
+    ],
+    "registerBeforeAuthenticateSteam": [
+      "runtime_javascript_init.go",
+      671
+    ],
+    "registerAfterAuthenticateSteam": [
+      "runtime_javascript_init.go",
+      675
+    ],
+    "registerBeforeSessionRefresh": [
+      "runtime_javascript_init.go",
+      679
+    ],
+    "registerAfterSessionRefresh": [
+      "runtime_javascript_init.go",
+      683
+    ],
+    "registerBeforeListChannelMessages": [
+      "runtime_javascript_init.go",
+      687
+    ],
+    "registerAfterListChannelMessages": [
+      "runtime_javascript_init.go",
+      691
+    ],
+    "registerBeforeListFriends": [
+      "runtime_javascript_init.go",
+      695
+    ],
+    "registerAfterListFriends": [
+      "runtime_javascript_init.go",
+      699
+    ],
+    "registerBeforeListFriendsOfFriends": [
+      "runtime_javascript_init.go",
+      703
+    ],
+    "registerAfterListFriendsOfFriends": [
+      "runtime_javascript_init.go",
+      707
+    ],
+    "registerBeforeAddFriends": [
+      "runtime_javascript_init.go",
+      711
+    ],
+    "registerAfterAddFriends": [
+      "runtime_javascript_init.go",
+      715
+    ],
+    "registerBeforeDeleteFriends": [
+      "runtime_javascript_init.go",
+      719
+    ],
+    "registerAfterDeleteFriends": [
+      "runtime_javascript_init.go",
+      723
+    ],
+    "registerBeforeBlockFriends": [
+      "runtime_javascript_init.go",
+      727
+    ],
+    "registerAfterBlockFriends": [
+      "runtime_javascript_init.go",
+      731
+    ],
+    "registerBeforeImportFacebookFriends": [
+      "runtime_javascript_init.go",
+      735
+    ],
+    "registerAfterImportFacebookFriends": [
+      "runtime_javascript_init.go",
+      739
+    ],
+    "registerBeforeImportSteamFriends": [
+      "runtime_javascript_init.go",
+      743
+    ],
+    "registerAfterImportSteamFriends": [
+      "runtime_javascript_init.go",
+      747
+    ],
+    "registerBeforeCreateGroup": [
+      "runtime_javascript_init.go",
+      751
+    ],
+    "registerAfterCreateGroup": [
+      "runtime_javascript_init.go",
+      755
+    ],
+    "registerBeforeUpdateGroup": [
+      "runtime_javascript_init.go",
+      759
+    ],
+    "registerAfterUpdateGroup": [
+      "runtime_javascript_init.go",
+      763
+    ],
+    "registerBeforeDeleteGroup": [
+      "runtime_javascript_init.go",
+      767
+    ],
+    "registerAfterDeleteGroup": [
+      "runtime_javascript_init.go",
+      771
+    ],
+    "registerBeforeJoinGroup": [
+      "runtime_javascript_init.go",
+      775
+    ],
+    "registerAfterJoinGroup": [
+      "runtime_javascript_init.go",
+      779
+    ],
+    "registerBeforeLeaveGroup": [
+      "runtime_javascript_init.go",
+      783
+    ],
+    "registerAfterLeaveGroup": [
+      "runtime_javascript_init.go",
+      787
+    ],
+    "registerBeforeAddGroupUsers": [
+      "runtime_javascript_init.go",
+      791
+    ],
+    "registerAfterAddGroupUsers": [
+      "runtime_javascript_init.go",
+      795
+    ],
+    "registerBeforeBanGroupUsers": [
+      "runtime_javascript_init.go",
+      799
+    ],
+    "registerAfterBanGroupUsers": [
+      "runtime_javascript_init.go",
+      803
+    ],
+    "registerBeforeKickGroupUsers": [
+      "runtime_javascript_init.go",
+      807
+    ],
+    "registerAfterKickGroupUsers": [
+      "runtime_javascript_init.go",
+      811
+    ],
+    "registerBeforePromoteGroupUsers": [
+      "runtime_javascript_init.go",
+      815
+    ],
+    "registerAfterPromoteGroupUsers": [
+      "runtime_javascript_init.go",
+      819
+    ],
+    "registerBeforeDemoteGroupUsers": [
+      "runtime_javascript_init.go",
+      823
+    ],
+    "registerAfterDemoteGroupUsers": [
+      "runtime_javascript_init.go",
+      827
+    ],
+    "registerBeforeListGroupUsers": [
+      "runtime_javascript_init.go",
+      831
+    ],
+    "registerAfterListGroupUsers": [
+      "runtime_javascript_init.go",
+      835
+    ],
+    "registerBeforeListUserGroups": [
+      "runtime_javascript_init.go",
+      839
+    ],
+    "registerAfterListUserGroups": [
+      "runtime_javascript_init.go",
+      843
+    ],
+    "registerBeforeListGroups": [
+      "runtime_javascript_init.go",
+      847
+    ],
+    "registerAfterListGroups": [
+      "runtime_javascript_init.go",
+      851
+    ],
+    "registerBeforeDeleteLeaderboardRecord": [
+      "runtime_javascript_init.go",
+      855
+    ],
+    "registerAfterDeleteLeaderboardRecord": [
+      "runtime_javascript_init.go",
+      859
+    ],
+    "registerBeforeDeleteTournamentRecord": [
+      "runtime_javascript_init.go",
+      863
+    ],
+    "registerAfterDeleteTournamentRecord": [
+      "runtime_javascript_init.go",
+      867
+    ],
+    "registerBeforeListLeaderboardRecords": [
+      "runtime_javascript_init.go",
+      871
+    ],
+    "registerAfterListLeaderboardRecords": [
+      "runtime_javascript_init.go",
+      875
+    ],
+    "registerBeforeWriteLeaderboardRecord": [
+      "runtime_javascript_init.go",
+      879
+    ],
+    "registerAfterWriteLeaderboardRecord": [
+      "runtime_javascript_init.go",
+      883
+    ],
+    "registerBeforeListLeaderboardRecordsAroundOwner": [
+      "runtime_javascript_init.go",
+      887
+    ],
+    "registerAfterListLeaderboardRecordsAroundOwner": [
+      "runtime_javascript_init.go",
+      891
+    ],
+    "registerBeforeLinkApple": [
+      "runtime_javascript_init.go",
+      895
+    ],
+    "registerAfterLinkApple": [
+      "runtime_javascript_init.go",
+      899
+    ],
+    "registerBeforeLinkCustom": [
+      "runtime_javascript_init.go",
+      903
+    ],
+    "registerAfterLinkCustom": [
+      "runtime_javascript_init.go",
+      911
+    ],
+    "registerBeforeLink": [
+      "runtime_javascript_init.go",
+      907
+    ],
+    "registerAfterLink": [
+      "runtime_javascript_init.go",
+      915
+    ],
+    "registerBeforeLinkDevice": [
+      "runtime_javascript_init.go",
+      919
+    ],
+    "registerAfterLinkDevice": [
+      "runtime_javascript_init.go",
+      923
+    ],
+    "registerBeforeLinkEmail": [
+      "runtime_javascript_init.go",
+      927
+    ],
+    "registerAfterLinkEmail": [
+      "runtime_javascript_init.go",
+      931
+    ],
+    "registerBeforeLinkFacebook": [
+      "runtime_javascript_init.go",
+      935
+    ],
+    "registerAfterLinkFacebook": [
+      "runtime_javascript_init.go",
+      939
+    ],
+    "registerBeforeLinkFacebookInstantGame": [
+      "runtime_javascript_init.go",
+      943
+    ],
+    "registerAfterLinkFacebookInstantGame": [
+      "runtime_javascript_init.go",
+      947
+    ],
+    "registerBeforeLinkGameCenter": [
+      "runtime_javascript_init.go",
+      951
+    ],
+    "registerAfterLinkGameCenter": [
+      "runtime_javascript_init.go",
+      955
+    ],
+    "registerBeforeLinkGoogle": [
+      "runtime_javascript_init.go",
+      959
+    ],
+    "registerAfterLinkGoogle": [
+      "runtime_javascript_init.go",
+      963
+    ],
+    "registerBeforeLinkSteam": [
+      "runtime_javascript_init.go",
+      967
+    ],
+    "registerAfterLinkSteam": [
+      "runtime_javascript_init.go",
+      971
+    ],
+    "registerBeforeListMatches": [
+      "runtime_javascript_init.go",
+      975
+    ],
+    "registerAfterListMatches": [
+      "runtime_javascript_init.go",
+      979
+    ],
+    "registerBeforeListNotifications": [
+      "runtime_javascript_init.go",
+      983
+    ],
+    "registerAfterListNotifications": [
+      "runtime_javascript_init.go",
+      987
+    ],
+    "registerBeforeDeleteNotifications": [
+      "runtime_javascript_init.go",
+      991
+    ],
+    "registerAfterDeleteNotifications": [
+      "runtime_javascript_init.go",
+      995
+    ],
+    "registerBeforeListStorageObjects": [
+      "runtime_javascript_init.go",
+      999
+    ],
+    "registerAfterListStorageObjects": [
+      "runtime_javascript_init.go",
+      1003
+    ],
+    "registerBeforeReadStorageObjects": [
+      "runtime_javascript_init.go",
+      1007
+    ],
+    "registerAfterReadStorageObjects": [
+      "runtime_javascript_init.go",
+      1011
+    ],
+    "registerBeforeWriteStorageObjects": [
+      "runtime_javascript_init.go",
+      1015
+    ],
+    "registerAfterWriteStorageObjects": [
+      "runtime_javascript_init.go",
+      1019
+    ],
+    "registerBeforeDeleteStorageObjects": [
+      "runtime_javascript_init.go",
+      1023
+    ],
+    "registerAfterDeleteStorageObjects": [
+      "runtime_javascript_init.go",
+      1027
+    ],
+    "registerBeforeJoinTournament": [
+      "runtime_javascript_init.go",
+      1031
+    ],
+    "registerAfterJoinTournament": [
+      "runtime_javascript_init.go",
+      1035
+    ],
+    "registerBeforeListTournamentRecords": [
+      "runtime_javascript_init.go",
+      1039
+    ],
+    "registerAfterListTournamentRecords": [
+      "runtime_javascript_init.go",
+      1043
+    ],
+    "registerBeforeListTournaments": [
+      "runtime_javascript_init.go",
+      1047
+    ],
+    "registerAfterListTournaments": [
+      "runtime_javascript_init.go",
+      1051
+    ],
+    "registerBeforeWriteTournamentRecord": [
+      "runtime_javascript_init.go",
+      1055
+    ],
+    "registerAfterWriteTournamentRecord": [
+      "runtime_javascript_init.go",
+      1059
+    ],
+    "registerBeforeListTournamentRecordsAroundOwner": [
+      "runtime_javascript_init.go",
+      1063
+    ],
+    "registerAfterListTournamentRecordsAroundOwner": [
+      "runtime_javascript_init.go",
+      1067
+    ],
+    "registerBeforeUnlinkApple": [
+      "runtime_javascript_init.go",
+      1071
+    ],
+    "registerAfterUnlinkApple": [
+      "runtime_javascript_init.go",
+      1075
+    ],
+    "registerBeforeUnlinkCustom": [
+      "runtime_javascript_init.go",
+      1079
+    ],
+    "registerAfterUnlinkCustom": [
+      "runtime_javascript_init.go",
+      1087
+    ],
+    "registerBeforeUnlink": [
+      "runtime_javascript_init.go",
+      1083
+    ],
+    "registerAfterUnlink": [
+      "runtime_javascript_init.go",
+      1091
+    ],
+    "registerBeforeUnlinkDevice": [
+      "runtime_javascript_init.go",
+      1095
+    ],
+    "registerAfterUnlinkDevice": [
+      "runtime_javascript_init.go",
+      1099
+    ],
+    "registerBeforeUnlinkEmail": [
+      "runtime_javascript_init.go",
+      1103
+    ],
+    "registerAfterUnlinkEmail": [
+      "runtime_javascript_init.go",
+      1107
+    ],
+    "registerBeforeUnlinkFacebook": [
+      "runtime_javascript_init.go",
+      1111
+    ],
+    "registerAfterUnlinkFacebook": [
+      "runtime_javascript_init.go",
+      1115
+    ],
+    "registerBeforeUnlinkFacebookInstantGame": [
+      "runtime_javascript_init.go",
+      1119
+    ],
+    "registerAfterUnlinkFacebookInstantGame": [
+      "runtime_javascript_init.go",
+      1123
+    ],
+    "registerBeforeUnlinkGameCenter": [
+      "runtime_javascript_init.go",
+      1127
+    ],
+    "registerAfterUnlinkGameCenter": [
+      "runtime_javascript_init.go",
+      1131
+    ],
+    "registerBeforeUnlinkGoogle": [
+      "runtime_javascript_init.go",
+      1135
+    ],
+    "registerAfterUnlinkGoogle": [
+      "runtime_javascript_init.go",
+      1139
+    ],
+    "registerBeforeUnlinkSteam": [
+      "runtime_javascript_init.go",
+      1143
+    ],
+    "registerAfterUnlinkSteam": [
+      "runtime_javascript_init.go",
+      1147
+    ],
+    "registerBeforeGetUsers": [
+      "runtime_javascript_init.go",
+      1151
+    ],
+    "registerAfterGetUsers": [
+      "runtime_javascript_init.go",
+      1155
+    ],
+    "registerBeforeValidatePurchaseApple": [
+      "runtime_javascript_init.go",
+      1159
+    ],
+    "registerAfterValidatePurchaseApple": [
+      "runtime_javascript_init.go",
+      1163
+    ],
+    "registerBeforeValidateSubscriptionApple": [
+      "runtime_javascript_init.go",
+      1167
+    ],
+    "registerAfterValidateSubscriptionApple": [
+      "runtime_javascript_init.go",
+      1171
+    ],
+    "registerBeforeValidatePurchaseGoogle": [
+      "runtime_javascript_init.go",
+      1175
+    ],
+    "registerAfterValidatePurchaseGoogle": [
+      "runtime_javascript_init.go",
+      1179
+    ],
+    "registerBeforeValidateSubscriptionGoogle": [
+      "runtime_javascript_init.go",
+      1183
+    ],
+    "registerAfterValidateSubscriptionGoogle": [
+      "runtime_javascript_init.go",
+      1187
+    ],
+    "registerBeforeValidatePurchaseHuawei": [
+      "runtime_javascript_init.go",
+      1191
+    ],
+    "registerAfterValidatePurchaseHuawei": [
+      "runtime_javascript_init.go",
+      1195
+    ],
+    "registerBeforeValidatePurchaseFacebookInstant": [
+      "runtime_javascript_init.go",
+      1199
+    ],
+    "registerAfterValidatePurchaseFacebookInstant": [
+      "runtime_javascript_init.go",
+      1203
+    ],
+    "registerBeforeValidatePurchaseSamsung": [
+      "runtime_javascript_init.go",
+      1207
+    ],
+    "registerAfterValidatePurchaseSamsung": [
+      "runtime_javascript_init.go",
+      1211
+    ],
+    "registerBeforeListSubscriptions": [
+      "runtime_javascript_init.go",
+      1215
+    ],
+    "registerAfterListSubscriptions": [
+      "runtime_javascript_init.go",
+      1219
+    ],
+    "registerBeforeGetSubscription": [
+      "runtime_javascript_init.go",
+      1223
+    ],
+    "registerAfterGetSubscription": [
+      "runtime_javascript_init.go",
+      1227
+    ],
+    "registerBeforeListParties": [
+      "runtime_javascript_init.go",
+      1231
+    ],
+    "registerAfterListParties": [
+      "runtime_javascript_init.go",
+      1235
+    ],
+    "registerBeforeEvent": [
+      "runtime_javascript_init.go",
+      1239
+    ],
+    "registerAfterEvent": [
+      "runtime_javascript_init.go",
+      1243
+    ],
+    "registerStorageIndex": [
+      "runtime_javascript_init.go",
+      1247
+    ],
+    "registerStorageIndexFilter": [
+      "runtime_javascript_init.go",
+      1290
+    ]
+  },
+  "MatchDispatcher": {
+    "broadcastMessage": [
+      "runtime_javascript_match_core.go",
+      581
+    ],
+    "broadcastMessageDeferred": [
+      "runtime_javascript_match_core.go",
+      596
+    ],
+    "matchKick": [
+      "runtime_javascript_match_core.go",
+      765
+    ],
+    "matchLabelUpdate": [
+      "runtime_javascript_match_core.go",
+      831
+    ]
+  }
+}
