@@ -2,6 +2,7 @@ extends Node
 
 signal state_changed
 var state: Dictionary = {}
+var state_ready: bool = false
 var last_error: String = ""
 var _client: NakamaClient
 var _session: NakamaSession
@@ -49,11 +50,17 @@ func _check(reply: NakamaAsyncResult) -> bool:
 	last_error = ""
 	return true
 
-func _accept(reply: NakamaSession) -> bool:
+func _accept(reply: NakamaSession, reset_state: bool = false) -> bool:
 	if not _check(reply):
 		return false
+	var invalidate_state := reset_state or _session == null or _session.user_id != reply.user_id
+	if invalidate_state:
+		state = {}
+		state_ready = false
 	_session = reply
 	_persist()
+	if invalidate_state:
+		state_changed.emit()
 	return true
 
 func _refresh_session() -> bool:
@@ -73,7 +80,10 @@ func restore() -> bool:
 	var refresh_token: String = config.get_value("session", "refresh_token", "")
 	if refresh_token.is_empty():
 		return false
+	state = {}
+	state_ready = false
 	_session = NakamaSession.new(null, false, refresh_token)
+	state_changed.emit()
 	if not await _refresh_session():
 		return false
 	return await refresh_state()
@@ -93,7 +103,7 @@ func authenticate(email: String = "", password: String = "", create: bool = fals
 		reply = await _client.authenticate_device_async(identity)
 	else:
 		reply = await _client.authenticate_email_async(email.strip_edges(), password, null, create)
-	if not _accept(reply):
+	if not _accept(reply, true):
 		return false
 	return await refresh_state()
 
@@ -117,10 +127,11 @@ func call_rpc(id: String, payload: Dictionary = {}) -> bool:
 	if not _check(reply):
 		return false
 	var decoded: Variant = JSON.parse_string(reply.get("payload"))
-	if not decoded is Dictionary or not decoded.get("state") is Dictionary:
+	if not decoded is Dictionary or not decoded.get("state") is Dictionary or decoded.state.is_empty():
 		last_error = "Invalid server snapshot."
 		return false
 	state = decoded.state
+	state_ready = true
 	state_changed.emit()
 	return true
 
@@ -147,5 +158,6 @@ func delete_account() -> bool:
 func clear_session() -> void:
 	_session = null
 	state = {}
+	state_ready = false
 	DirAccess.remove_absolute(SESSION_PATH)
 	state_changed.emit()

@@ -20,6 +20,7 @@ func _run() -> void:
 	var previous := FileAccess.get_file_as_bytes(path) if existed else PackedByteArray()
 	var unique := Crypto.new().generate_random_bytes(16).hex_encode()
 	check(await backend.authenticate("godot-" + unique + "@example.com", unique, true), "Email auth and bootstrap")
+	check(backend.state_ready, "Successful bootstrap unlocks protected screens")
 	if not backend.token.is_empty():
 		check(await backend.call_rpc("complete_tutorial"), "RPC string-envelope decoding")
 		check(backend.state.get("coins") == 10, "Canonical reward applied")
@@ -27,15 +28,17 @@ func _run() -> void:
 		check(backend.state.get("coins") == 10, "Reward granted once")
 		check(await backend.restore(), "Refresh token persistence and restore")
 		check(await backend.delete_account(), "Account deletion")
+		check(not backend.state_ready, "Account deletion invalidates readiness")
 	# Exercise device auth without touching the installation identity file.
 	var guest: NakamaSession = await backend._client.authenticate_device_async(unique)
 	check(backend._accept(guest), "Official SDK guest auth")
+	check(not backend.state_ready, "A new session waits for its own snapshot")
 	if not backend.token.is_empty():
 		check(await backend.refresh_state(), "Guest bootstrap")
 		var guest_id: String = backend._session.user_id
 		check(await backend.link_email("linked-" + unique + "@example.com", unique), "SDK email linking")
 		await backend.logout()
-		check(backend.token.is_empty() and backend.state.is_empty(), "SDK logout clears account state")
+		check(backend.token.is_empty() and backend.state.is_empty() and not backend.state_ready, "SDK logout clears account state")
 		check(await backend.authenticate("linked-" + unique + "@example.com", unique, false), "SDK linked email login")
 		check(backend._session.user_id == guest_id, "Linking preserves player identity")
 		check(await backend.delete_account(), "Guest account cleanup")

@@ -2,7 +2,7 @@
 
 Use the [Android interview](../.agents/skills/mobile-android-export/SKILL.md) or [iOS interview](../.agents/skills/mobile-ios-export/SKILL.md) for help with prerequisites, private signing, generated branding, and checks on a device. Each asks a few questions at a time.
 
-The client uses a 720×1280 portrait canvas with Compatibility rendering. Controls are large, and screens scroll on short displays. Test touch, keyboard avoidance, safe areas, resume, and network interruptions on the target device. Mouse emulation is useful while developing, but you still need a device test.
+The client uses a 720×1280 portrait canvas with Compatibility rendering. Controls are large, and screens scroll on short displays. Test touch, keyboard avoidance, safe areas, resume, and network interruptions on the target device. The active game scene stays mounted during resume refreshes. Update game HUD/state observers through `Backend.state_changed` rather than relying on scene recreation. Android system Back navigates through the controller; automatic Back-to-quit is disabled. Mouse emulation is useful while developing, but you still need a device test.
 
 Run `configure` after changing GAME_TITLE, BUNDLE_ID, CLIENT_API_URL, NAKAMA_SERVER_KEY, APP_VERSION/APP_BUILD_NUMBER, team, or asset fields. Both export presets include public config and exclude server files, env files, and tooling. Keep server credentials out of GDScript.
 

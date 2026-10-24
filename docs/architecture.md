@@ -6,7 +6,7 @@ The official Nakama Godot SDK handles HTTP transport and REST serialization. `Ba
 
 Each request has a 15-second timeout. The wrapper refreshes sessions nearing expiry before sending a request; a definite HTTP 401 can trigger a refresh and one retry. SDK automatic refresh and retries are disabled. The wrapper saves every refreshed token and never replays a write whose outcome is uncertain, including after a network failure.
 
-When the app resumes, it fetches the server's current state. Menu entry requires a valid session and a successful `get_state` call. Logout clears player state and the cached refresh token. Device preferences stay in place when players switch accounts.
+When the app resumes, it fetches the server's current state without remounting the active screen or game scene. The player summary and example beacon observe `Backend.state_changed` to update in place. Menu, account and game entry require a valid session and `Backend.state_ready`, set only after a nonempty canonical snapshot loads. A failed bootstrap keeps these screens locked even when authentication returned a token. Fresh authentication, restore, account switching and session clearing invalidate readiness; same-account token refresh preserves the already loaded snapshot. Android system Back uses the navigation controller with automatic quitting disabled, and is ignored during pending requests. Logout clears player state and the cached refresh token. Device preferences stay in place when players switch accounts.
 
 ## Player record
 

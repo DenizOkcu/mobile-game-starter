@@ -35,3 +35,11 @@ The project tooling, API smoke checks, and unit tests now use Node.js built-ins 
 After starting Docker Desktop, `up` and both API/Godot SDK `smoke` checks passed. The local stack remains running; `down` preserves its data. An Android resource-pack export and inspection confirmed that the MIT and SDK licenses and public config are included while framework metadata, tooling and private env files are excluded. The sandboxed export emitted macOS certificate/editor-settings permission diagnostics; pack generation and content checks succeeded. This did not verify an APK, signed build, physical device or production deployment. Android build-tools remain unconfigured.
 
 Release handling was tested against local fixture tags. The initial framework release is version 0.1.0; its matching `v0.1.0` tag identifies the source baseline. Future releases follow the maintainer checklist in `docs/framework-updates.md`.
+
+## 0.1.1 lifecycle and bootstrap fixes (24 October 2026)
+
+`check`, `up`, and API/Godot SDK `smoke` passed. In addition to the 19 Node tooling tests, headless Godot regressions cover failed authentication bootstrap and recovery, empty-snapshot rejection, account switching, same-account token refresh, protected navigation, system Back while idle/pending, successful and failed resume refreshes, duplicate resume notifications, in-place player-summary updates, preservation of the active game instance/run state, and preservation of disabled controls. The transport fixtures use in-memory sessions; the backend fixture suppresses session persistence. Live checks use disposable accounts and restore the temporary session file.
+
+A disposable repository generated from the actual `v0.1.0` snapshot successfully applied the prepared `0.1.1` patch and passed the upgraded `check` command while retaining its original `client/game/game.gd`. No server RPC, player schema, database or env migration was needed. Custom games should integrate their own `Backend.state_changed` HUD handling as described in the changelog.
+
+These headless tests verify the navigation and lifecycle code paths, not OS delivery on physical devices. Android/iOS device background/resume, Android system Back gestures/buttons, and signed exports remain separate checks. Godot still reports that Android build-tools are unconfigured on this machine.

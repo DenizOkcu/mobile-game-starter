@@ -3,10 +3,12 @@ extends Control
 var margin: MarginContainer
 var content: VBoxContainer
 var status: Label
+var player_summary: Label
 var current_screen: String = "auth"
 var pending: bool = false
 
 func _ready() -> void:
+	get_tree().quit_on_go_back = false
 	var theme_resource := Theme.new()
 	theme_resource.default_font_size = 26
 	theme = theme_resource
@@ -24,15 +26,16 @@ func _ready() -> void:
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 20)
 	scroll.add_child(content)
+	Backend.state_changed.connect(_update_player_summary)
 	_show("auth")
 	if not "--test" in OS.get_cmdline_user_args():
 		await _run(Backend.restore, "menu")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_RESUMED and is_node_ready() and not pending and not Backend.token.is_empty():
-		_run(Backend.refresh_state, current_screen)
+		_run(Backend.refresh_state, "")
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST and not pending:
-		_show("auth" if Backend.token.is_empty() else "menu")
+		_show("menu")
 
 func _label(text: String, size: int = 26) -> Label:
 	var label := Label.new()
@@ -59,13 +62,15 @@ func _field(placeholder: String, secret: bool = false) -> LineEdit:
 	return field
 
 func _show(screen: String) -> void:
+	if screen in ["menu", "account", "game"] and (Backend.token.is_empty() or not Backend.state_ready):
+		screen = "auth"
 	current_screen = screen
 	for child in content.get_children():
 		content.remove_child(child)
 		child.queue_free()
 	_label(AppConfig.game_title, 44)
-	if not Backend.state.is_empty():
-		_label("%s · %d coins" % [Backend.state.get("display_name", "Player"), Backend.state.get("coins", 0)], 24)
+	player_summary = _label("", 24)
+	_update_player_summary()
 	match screen:
 		"auth": _auth()
 		"menu": _menu()
@@ -76,7 +81,13 @@ func _show(screen: String) -> void:
 			game.back_requested.connect(func() -> void: _show("menu"))
 			game.action_requested.connect(_complete_tutorial)
 			content.add_child(game)
-	status = _label(AppConfig.error_message if not AppConfig.error_message.is_empty() else "", 22)
+	status = _label(AppConfig.error_message if not AppConfig.error_message.is_empty() else "", 24)
+
+func _update_player_summary() -> void:
+	if not is_instance_valid(player_summary):
+		return
+	player_summary.visible = Backend.state_ready and not Backend.token.is_empty()
+	player_summary.text = "%s · %d coins" % [Backend.state.get("display_name", "Player"), Backend.state.get("coins", 0)]
 
 func _auth() -> void:
 	_label("Start a prototype", 32)
@@ -120,7 +131,7 @@ func _settings() -> void:
 			Preferences.set(setting, value)
 			Preferences.save())
 		content.add_child(toggle)
-	_button("Back", func() -> void: _show("auth" if Backend.token.is_empty() else "menu"))
+	_button("Back", func() -> void: _show("menu"))
 
 func _account() -> void:
 	_label("Account", 32)
@@ -144,9 +155,19 @@ func _account() -> void:
 
 func _lock(node: Node, locked: bool) -> void:
 	if node is BaseButton:
-		node.disabled = locked
+		if locked:
+			node.set_meta("request_disabled", node.disabled)
+			node.disabled = true
+		elif node.has_meta("request_disabled"):
+			node.disabled = bool(node.get_meta("request_disabled"))
+			node.remove_meta("request_disabled")
 	if node is LineEdit:
-		node.editable = not locked
+		if locked:
+			node.set_meta("request_editable", node.editable)
+			node.editable = false
+		elif node.has_meta("request_editable"):
+			node.editable = bool(node.get_meta("request_editable"))
+			node.remove_meta("request_editable")
 	for child in node.get_children():
 		_lock(child, locked)
 
@@ -159,10 +180,12 @@ func _run(action: Callable, destination: String, success_message: String = "") -
 	var success: bool = await action.call()
 	pending = false
 	if success:
-		_show(destination)
+		if not destination.is_empty():
+			_show(destination)
+		_lock(content, false)
 		status.text = success_message
 	else:
-		if Backend.token.is_empty() and not Backend.last_error.is_empty():
+		if not Backend.state_ready:
 			_show("auth")
 		_lock(content, false)
 		status.text = Backend.last_error
