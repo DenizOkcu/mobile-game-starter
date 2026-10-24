@@ -12,10 +12,10 @@ Read `AGENTS.md`, `docs/setup/interview-contract.md`, and `docs/setup/security-v
 Start with up to three questions:
 
 1. Which development OS are you using: macOS, Windows, or Linux?
-2. Is this a fresh game copied from the starter, this existing starter, or an existing game with data to keep?
+2. Is this a new game created from the GitHub template, this existing starter, or an existing game with data to keep?
 3. Where should the first run happen: editor first (recommended), Android emulator, or physical Android/iOS device?
 
-Use existing answers/evidence. Inspect repo status, the configured Godot version, and command availability. If creating a new game, follow `docs/new-game-prompt.md`; preserve `.agents/skills` and `.env.example`, exclude existing `.git`, private env files, `.godot`, `node_modules`, compiled modules, exports, backups and `.setup`. Do not reset the user's repository to create a starter.
+Use existing answers/evidence. Inspect repo status, the configured Godot version, and command availability. If creating a new game, follow `docs/new-game-prompt.md`: guide the developer through **Use this template → Create a new repository**, then clone their new repository. Keep its `.git`, `.agents/skills` and `.env.example`; do not run `git init` again or reset an existing repository. Never copy private env files, generated config, build outputs, signing credentials or `.setup` from another game. If already in a generated game repository, continue there.
 
 ## Round 2 — verify tools before installing
 
@@ -41,7 +41,8 @@ Ask for a working title, stable reverse-domain bundle ID, and whether other loca
 
 - If `.env` is absent, run `node tools/manage.mjs init`.
 - If it exists, validate through tooling; do not overwrite or print it.
-- Set `GAME_TITLE`, `BUNDLE_ID`, `COMPOSE_PROJECT_NAME`, `GODOT_BIN`, and local ports. Preserve existing secrets and player data.
+- Before the first `up`, set `GAME_TITLE`, a stable `BUNDLE_ID`, a unique `COMPOSE_PROJECT_NAME`, `GODOT_BIN`, and available local ports. `init` generates fresh secrets but retains example identity and ports. Keep `CLIENT_API_URL` aligned with `LOCAL_API_PORT`. Preserve existing secrets and player data; do not rename an existing Compose project as a routine setup step because it selects a different database volume.
+- Run `configure` after env edits before opening Godot; `up` also regenerates configuration. Production uses a separately initialized env file, its own domain, and a dedicated deployment path through the production interview.
 - All seven Nakama/database fields must be independently generated even locally; no default `localadmin`/`defaultkey` credentials. There is no extra developer bypass key to invent.
 - Default `CLIENT_API_URL` is loopback with LOCAL_API_PORT; LOCAL_BIND_IP remains 127.0.0.1 for editor-only work.
 

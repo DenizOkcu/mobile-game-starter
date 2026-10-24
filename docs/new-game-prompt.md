@@ -10,6 +10,8 @@
 >
 > If prerequisites are missing, use the repo-local local-development interview skill and ask a few questions at a time. Run check and the relevant integration tests, update the README with controls and changes, and report remaining device/deployment checks. Do not deploy to production unless requested.
 
-To start a separate game repository, copy Mobile Game Starter without `.git`, `.env*` (retain `.env.example`), `.godot`, `client/config.json`, `exports`, `backups`, `node_modules`, compiled server modules, or `.setup`. Run `git init -b main`, then `node tools/manage.mjs init`.
+To start a separate game repository, select **Use this template → Create a new repository** on [Mobile Game Starter](https://github.com/DenizOkcu/mobile-game-starter), then clone your new repository. Use the default branch. Keep its `.git` directory, `.agents/skills/`, and `.env.example`; do not run `git init` again. Run `node tools/manage.mjs init` for fresh secrets. Never copy private env files, generated client config, signing credentials, build outputs, or `.setup` notes from another game.
 
-Give each game its own COMPOSE_PROJECT_NAME, GAME_TITLE, BUNDLE_ID, ports, VPS path, domain, and secrets. The starter uses existing game repositories as references; it does not depend on them.
+Before the first `up`, edit `.env` for the new game's identity and available local ports, keeping `CLIENT_API_URL` aligned with `LOCAL_API_PORT`. `init` retains the example identity and ports. `up` regenerates public config and export metadata; use `configure` after later env edits before opening or exporting in Godot.
+
+Give each game its own COMPOSE_PROJECT_NAME, GAME_TITLE, BUNDLE_ID, ports, VPS path, domain, and secrets. Games created from the template are independent; later starter updates are not applied automatically.

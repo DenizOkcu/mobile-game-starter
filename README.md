@@ -6,6 +6,12 @@ Mobile Game Starter is a kit for building mobile game prototypes, on your own or
 
 The kit includes guest access, email registration and login, guest-to-email linking, session restore using refresh tokens, logout, and account deletion. It also has a main menu, account and profile screen, device settings for volume, haptics, and reduced motion, and a game scene you can replace. The tutorial grants a reward once per account: the client sends an action, the server updates the player record, and the client receives the saved state.
 
+## Create your game repository
+
+On [Mobile Game Starter](https://github.com/DenizOkcu/mobile-game-starter), select **Use this template → Create a new repository**. Clone your new repository and run the commands below from its root. GitHub creates an independent history; keep the new repository's `.git` directory and do not run `git init` again. The default branch is enough.
+
+Each game keeps the repository-local setup skills and `.env.example`. Run `init` in the new clone to generate fresh secrets; never copy another game's private env files or setup notes. Template updates do not automatically update games created from it.
+
 ## Guided setup with an LLM
 
 Start with [the setup guide](docs/start-here.md). Say "Help me get started locally" and the assistant will ask a few questions, check your tools, and help you run the game. The repository also includes skills for secure VPS deployment and Android/iOS exports, including signing, generated icons, and splash art.
@@ -18,12 +24,15 @@ Prerequisites: Godot 4.7.2, Node.js 22+ with npm, Bash, Docker with Compose v2 s
 
 ```sh
 node tools/manage.mjs init
+# Edit .env to set your game identity and available local ports.
 node tools/manage.mjs up
 ```
 
 Open `project.godot` in Godot and press F5. Click **Play as guest**, then **Play**, then activate the beacon. The server grants 10 coins once. Restart the game to restore the same player. Link an email under Account to use the same progress on another installation.
 
 `init` creates a private `.env` with independent random secrets and generates public client config. It refuses to overwrite an existing file. If you prefer to copy `.env.example` manually, replace **every** `change_me` value with a different random URL-safe string of at least 32 characters before running `configure`.
+
+Before the first `up`, edit `.env`: set `GAME_TITLE`, a stable reverse-domain `BUNDLE_ID`, and a unique `COMPOSE_PROJECT_NAME`. Choose unused `LOCAL_API_PORT` and `LOCAL_CONSOLE_PORT` values if another game is running, and keep the port in `CLIENT_API_URL` aligned with `LOCAL_API_PORT`. `init` generates secrets but retains example identity and port values. `up` regenerates public config and export metadata; after later env changes, run `configure` before opening or exporting in Godot. For production, initialize a separate `.env.production` and select the game's own domain and dedicated deployment path.
 
 | Command | Purpose |
 | --- | --- |
@@ -61,3 +70,7 @@ The game needs a working server connection to authenticate and load player state
 The refresh token lives in Godot's app-private `user://session.cfg`; the client never saves passwords. If your shipped game needs stronger protection for tokens on the device, use the platform Keychain or Keystore. Logout clears local credentials even when a network failure prevents remote revocation. Guest access uses a random installation ID. Players can lose access after uninstalling unless they have linked an email.
 
 Settings stay on the device. Master volume controls Godot's Master bus, and the haptics setting controls the example vibration. The starter has no animations; honor the reduced-motion preference when you add them. Each game still needs iOS and Android signing, store provisioning, and checks on physical devices.
+
+## License
+
+The starter's original code and documentation use the [MIT License](LICENSE), allowing reuse in commercial and private games. Preserve the license notice. Third-party components retain their own licenses, including the vendored Nakama Godot SDK's Apache-2.0 license; see [dependency provenance](docs/dependencies.md).

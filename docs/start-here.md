@@ -1,6 +1,8 @@
 # Mobile Game Starter: Setup with your coding assistant
 
-Open this repository in your coding assistant and say:
+First select **Use this template → Create a new repository** on [Mobile Game Starter](https://github.com/DenizOkcu/mobile-game-starter), then clone your new repository. Keep its Git history and included `.agents/skills/`; no manual copying or `git init` is needed. If you already have a game repository, continue there.
+
+Open your new clone in your coding assistant and say:
 
 > Help me get Mobile Game Starter running locally. Use the mobile-local-setup skill, interview me a few questions at a time, check existing tools first, and guide me until the Godot game talks to local Nakama.
 
@@ -16,6 +18,8 @@ The four setup skills live in `.agents/skills/`, so they stay with each new game
 | Turn an idea into a prototype | [Game prompt](new-game-prompt.md), after local setup works |
 
 The assistant asks a few questions at a time, checks what is installed, and saves progress without secrets under ignored `.setup/`. Say "resume local setup" or "resume the Android interview" to continue. Keep private keys, passwords, account tokens, and keystores out of chat. The assistant will help you set them on your machine.
+
+The setup interview also sets your game's title, stable bundle ID, unique Compose project name, and available local ports before starting services. `init` generates fresh secrets but leaves those example values unchanged. Keep `CLIENT_API_URL` aligned with the selected API port. Production gets a separately initialized env file, domain, and dedicated deployment path.
 
 Expect questions about your operating system, whether you are starting a new game or using an existing clone, and where you want to test: the editor, an Android emulator, or a phone. Docker Desktop or Docker Engine with Compose v2 must be running. The assistant checks installation and account requirements rather than assuming they are ready.
 
