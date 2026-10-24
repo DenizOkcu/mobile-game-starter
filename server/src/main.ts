@@ -1,7 +1,6 @@
 // Nakama runs this ES5 bundle, not Node.js. Keep named global RPC adapters.
 interface PlayerState {
   schema_version: number;
-  display_name: string;
   coins: number;
   tutorial_completed: boolean;
   created_at: number;
@@ -42,7 +41,24 @@ function intent(payload: string | undefined, allowed: string[]): Record<string, 
 function read(nk: nkruntime.Nakama, userId: string): PlayerRecord | null {
   const object = nk.storageRead([{ collection: COLLECTION, key: KEY, userId: userId }])[0];
   if (!object) return null;
-  if (object.value.schema_version !== 1) fail('Unsupported player schema', nkruntime.Codes.FAILED_PRECONDITION);
+  if (object.value.schema_version === 1) {
+    const account = nk.accountGetId(userId);
+    const legacyName = object.value.display_name;
+    if (typeof legacyName !== 'string') fail('Invalid legacy player name', nkruntime.Codes.FAILED_PRECONDITION);
+    const state = object.value;
+    delete state.display_name;
+    state.schema_version = 2;
+    try {
+      // Account and progression migrate together; a version conflict rolls both back.
+      nk.multiUpdate(account.user.displayName ? null : [{ userId: userId, displayName: legacyName }],
+        [{ collection: COLLECTION, key: KEY, userId: userId, value: state,
+          version: object.version, permissionRead: 0, permissionWrite: 0 }], null, null);
+    } catch (_) {
+      fail('State changed or storage unavailable; refresh and try again', nkruntime.Codes.ABORTED);
+    }
+    return read(nk, userId);
+  }
+  if (object.value.schema_version !== 2) fail('Unsupported player schema', nkruntime.Codes.FAILED_PRECONDITION);
   return { state: object.value as unknown as PlayerState, version: object.version };
 }
 
@@ -61,7 +77,7 @@ function load(nk: nkruntime.Nakama, userId: string): PlayerRecord {
   let record = read(nk, userId);
   if (record) return record;
   const now = Math.floor(Date.now() / 1000);
-  const state: PlayerState = { schema_version: 1, display_name: 'Player', coins: 0,
+  const state: PlayerState = { schema_version: 2, coins: 0,
     tutorial_completed: false, created_at: now, updated_at: now };
   try {
     save(nk, userId, state, '*');
@@ -74,7 +90,10 @@ function load(nk: nkruntime.Nakama, userId: string): PlayerRecord {
 }
 
 function snapshot(nk: nkruntime.Nakama, userId: string): string {
-  return JSON.stringify({ state: load(nk, userId).state, server_time: Math.floor(Date.now() / 1000) });
+  const state = load(nk, userId).state;
+  const account = nk.accountGetId(userId);
+  return JSON.stringify({ state: state, account: { display_name: account.user.displayName },
+    server_time: Math.floor(Date.now() / 1000) });
 }
 
 const getState: nkruntime.RpcFunction = function (ctx, _logger, nk, payload) {
@@ -91,9 +110,8 @@ const updateProfile: nkruntime.RpcFunction = function (ctx, _logger, nk, payload
       !/^[A-Za-z0-9 _-]+$/.test(name) || !/[A-Za-z0-9]/.test(name)) {
     fail('Name must be 1-24 ASCII letters, numbers, spaces, _ or -');
   }
-  const record = load(nk, userId);
-  record.state.display_name = name;
-  save(nk, userId, record.state, record.version);
+  load(nk, userId);
+  nk.accountUpdateId(userId, null, name);
   return snapshot(nk, userId);
 };
 

@@ -5,7 +5,8 @@ const TouchTargets = preload("res://client/core/touch_targets.gd")
 class TestClient extends NakamaClient:
 	var frames: SceneTree
 	var session_reply: NakamaSession
-	var snapshot: Dictionary = {"display_name": "Pilot", "coins": 10, "tutorial_completed": true}
+	var account_name: String = "Pilot"
+	var snapshot: Dictionary = {"coins": 10, "tutorial_completed": true}
 	var rpc_failure: bool = false
 	var rpc_calls: int = 0
 	var refresh_calls: int = 0
@@ -62,7 +63,9 @@ class TestClient extends NakamaClient:
 			return NakamaAPI.ApiRpc.new(NakamaException.new("Simulated access rejection", 401))
 		if rpc_failure:
 			return NakamaAPI.ApiRpc.new(NakamaException.new("Simulated timeout", 0))
-		return NakamaAPI.ApiRpc.create(NakamaAPI, {"payload": JSON.stringify({"state": snapshot})})
+		if _id == "update_profile":
+			account_name = JSON.parse_string(_payload).display_name
+		return NakamaAPI.ApiRpc.create(NakamaAPI, {"payload": JSON.stringify({"state": snapshot, "account": {"display_name": account_name}})})
 
 var failed: bool = false
 
@@ -121,8 +124,10 @@ func _run() -> void:
 	check(not probe.token.is_empty() and not probe.state_ready and probe.state.is_empty(), "A session alone does not mark player state ready")
 	client.rpc_failure = false
 	check(await probe.refresh_state() and probe.state_ready, "Bootstrap retry makes state ready")
+	check(probe.account.display_name == "Pilot" and not probe.state.has("display_name"), "Native account name is separate from progression")
 	check(probe._accept(session_for("first-player")) and probe.state_ready, "Same-account token refresh preserves readiness")
 	check(probe._accept(session_for("second-player")) and not probe.state_ready and probe.state.is_empty(), "Account switching discards the previous snapshot")
+	check(probe.account.is_empty(), "Account switching clears the previous native name")
 	check(await probe.refresh_state() and probe.state_ready, "New account can bootstrap")
 	check(probe._accept(session_for("second-player"), true) and not probe.state_ready, "Fresh authentication requires another bootstrap even for the same account")
 	client.snapshot = {}
@@ -132,7 +137,8 @@ func _run() -> void:
 	probe.state = {}
 	probe.state_ready = false
 	client.session_reply = recovering_session
-	client.snapshot = {"display_name": "Recovered", "coins": 0, "tutorial_completed": false}
+	client.account_name = "Recovered"
+	client.snapshot = {"coins": 0, "tutorial_completed": false}
 	client.refresh_failure = true
 	var refresh_before := client.refresh_calls
 	var rpc_before := client.rpc_calls
@@ -165,6 +171,7 @@ func _run() -> void:
 	client.refresh_failure_status = 401
 	check(not await probe.recover_session() and probe._session == null and not probe.state_ready, "Definitively rejected refresh credentials clear the session")
 	check(probe.clear_calls == clears_before + 1, "Definitive refresh rejection clears persisted credentials once")
+	check(probe.account.is_empty(), "Session clearing discards the native account name")
 
 	client.refresh_failure = false
 	client.refresh_failure_status = 0
@@ -219,12 +226,25 @@ func _run() -> void:
 	main._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	check(main.current_screen == "auth", "System Back cannot bypass failed bootstrap")
 
-	client.snapshot = {"display_name": "Pilot", "coins": 0, "tutorial_completed": false}
+	client.account_name = "Pilot"
+	client.snapshot = {"coins": 0, "tutorial_completed": false}
 	button_named(main.content, "Retry connection").pressed.emit()
 	check(main.pending, "Retry connection enters the serialized request flow")
 	for frame in range(4):
 		await process_frame
 	check(main.current_screen == "menu" and backend.state_ready, "Successful recovery enters the menu")
+	main._show("account")
+	var name_field: LineEdit
+	for child in main.content.get_children():
+		if child is LineEdit:
+			name_field = child
+			break
+	check(name_field != null and name_field.text == "Pilot", "Account editor loads the native name")
+	name_field.text = "Saved Pilot"
+	button_named(main.content, "Save name").pressed.emit()
+	for frame in range(4):
+		await process_frame
+	check(backend.account.display_name == "Saved Pilot" and main.player_summary.text == "Saved Pilot · 0 coins", "Save name interaction refreshes native account data and summary")
 	main._show("game")
 	var game := game_in(main)
 	var instance_id := game.get_instance_id()
@@ -232,7 +252,8 @@ func _run() -> void:
 	var disabled_control := Button.new()
 	disabled_control.disabled = true
 	game.add_child(disabled_control)
-	client.snapshot = {"display_name": "Restored Pilot", "coins": 10, "tutorial_completed": true}
+	client.account_name = "Restored Pilot"
+	client.snapshot = {"coins": 10, "tutorial_completed": true}
 	var calls_before := client.rpc_calls
 	main._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
 	check(main.pending, "Resume locks concurrent actions while refreshing")

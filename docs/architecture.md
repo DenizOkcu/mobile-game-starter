@@ -16,8 +16,7 @@ The record uses collection `player`, key `state`, and the authenticated `ctx.use
 
 ```json
 {
-  "schema_version": 1,
-  "display_name": "Player",
+  "schema_version": 2,
   "coins": 0,
   "tutorial_completed": false,
   "created_at": 0,
@@ -25,17 +24,17 @@ The record uses collection `player`, key `state`, and the authenticated `ctx.use
 }
 ```
 
-Timestamps use the server's UTC epoch seconds. On the first read, `get_state` creates the record with create-only version `*`. Existing records must use schema version 1; the server rejects unsupported versions. When extending a released game, migrate old fields in `load` before using them and keep version checks on migration writes.
+Timestamps use the server's UTC epoch seconds. On the first read, `get_state` creates the record with create-only version `*`. Schema-1 records migrate explicitly to schema 2: `display_name` moves to the native account only if its name is empty, then is removed from progression. Native account names take precedence. A version-checked `multiUpdate` commits the account and storage migration atomically, preserving progress and timestamps. Unsupported versions are rejected.
 
 | RPC | Request JSON | Result |
 | --- | --- | --- |
 | `get_state` | `{}` | Initialize/read current player's snapshot |
-| `update_profile` | `{"display_name":"Pilot"}` | Save a label of 1-24 ASCII letters, numbers, spaces, underscores, or hyphens |
+| `update_profile` | `{"display_name":"Pilot"}` | Update native account display name: 1-24 ASCII letters, numbers, spaces, underscores, or hyphens |
 | `complete_tutorial` | `{}` | Mark tutorial done and add 10 coins once |
 
-Every successful RPC returns `{"state": {...}, "server_time": 123}`. The REST RPC body is a JSON-encoded string that itself contains JSON; the response has a string `payload`. The official SDK handles this REST envelope, and `Backend.call_rpc` decodes the payload JSON. Other API calls use ordinary JSON objects.
+Every successful RPC returns `{"state": {...}, "account": {"display_name": "Pilot"}, "server_time": 123}`. The account projection is read from Nakama `account.user.displayName`, not stored progression. The client caches it separately and clears it on identity invalidation. Empty native names display as "Player" in the summary. [Nakama display names](https://heroiclabs.com/docs/nakama/concepts/user-accounts/) are not unique; only usernames are unique, so duplicate display names are accepted without a taken-name error. The REST RPC body is a JSON-encoded string that itself contains JSON; the response has a string `payload`. The official SDK handles this REST envelope, and `Backend.call_rpc` decodes the payload JSON. Other API calls use ordinary JSON objects.
 
-For each RPC, the server requires an authenticated user, rejects non-object JSON and unknown fields, loads the private record, checks the action's conditions, and saves using the version it read. Concurrent writes can fail with HTTP 409/code 10. The client must read current state before asking the player to try again. Storage outages return the same write error requiring a refresh. The server never writes unconditionally, and the client never retries mutations automatically.
+For each RPC, the server requires an authenticated user and rejects non-object JSON and unknown fields. Progression changes load the private record, check the action's conditions, and save using the version read. Profile updates use native `accountUpdateId` after migration and return the current account name; they do not mutate progression. Native account writes retain Nakama's last-write semantics. Concurrent writes can fail with HTTP 409/code 10. The client must read current state before asking the player to try again. Storage outages return the same write error requiring a refresh. The server never writes unconditionally, and the client never retries mutations automatically.
 
 `complete_tutorial` grants an onboarding bonus when the player acknowledges completion. Repeating it cannot grant another reward. After a response timeout, reading `tutorial_completed` tells the client whether the write succeeded. Do not use this as a template for accepting client-reported wins or scores: validate the actual game conditions on the server. Before supporting retries for transfers or repeatable purchases, save an operation receipt atomically with the mutation.
 
@@ -59,6 +58,6 @@ The implementation follows the official [Nakama Docker Compose](https://heroicla
 
 ## Backend build
 
-`server/src/main.ts` uses strict TypeScript and the official Nakama runtime types. `tsc` targets ES5 without a module loader and emits `server/modules/main.js`. `InitModule` registers the same three RPC IDs. The state schema has not changed, so existing player records still work. Compose mounts only compiled modules, and `--runtime.js_entrypoint main.js` selects the entry point.
+`server/src/main.ts` uses strict TypeScript and the official Nakama runtime types. `tsc` targets ES5 without a module loader and emits `server/modules/main.js`. `InitModule` registers the same three RPC IDs. Schema 2 explicitly migrates existing schema-1 records without resetting progress. Release the matching client and runtime together; schema-1-only runtimes cannot read migrated records. Compose mounts only compiled modules, and `--runtime.js_entrypoint main.js` selects the entry point.
 
 `build`, `up`, `check`, and `deploy` run `npm ci --ignore-scripts`, then type-check and compile. `up` also runs a headless Godot import pass so freshly cloned projects can launch without opening the editor first, then restarts Nakama to load module changes. The deployment archive contains the compiled runtime, without npm, node_modules, or TypeScript source. You need Node on your development machine; the VPS does not need it.
