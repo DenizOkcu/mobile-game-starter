@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { setupSpecs, runSpec } from './spec.mjs';
 import { godotTests } from './godot-tests.mjs';
 import { frameworkUpdate, recordFrameworkBaseline } from './framework-update.mjs';
 import { ROOT, readEnv, validate, init, configure, run, compose, serverEnvironment, parseArgs } from './lib.mjs';
@@ -58,9 +59,11 @@ try {
         case 'logs': compose(envFile, ['logs', '-f', '--tail', '100']); break;
         case 'status': compose(envFile, ['ps']); break;
         case 'check':
+          setupSpecs(); runSpec(['validate', '--all', '--strict', '--no-interactive']);
+          runSpec(['validate', '--archived', '--no-interactive']);
           buildServer(); configure(env);
           run(process.execPath, [path.join(ROOT, 'tools/nakama-reference.mjs'), '--check']);
-          run(process.execPath, ['--test', path.join(ROOT, 'tests/tooling.test.mjs'), path.join(ROOT, 'tests/framework-update.test.mjs'), path.join(ROOT, 'tests/nakama-reference.test.mjs'), path.join(ROOT, 'tests/godot-tests.test.mjs')]);
+          run(process.execPath, ['--test', path.join(ROOT, 'tests/tooling.test.mjs'), path.join(ROOT, 'tests/framework-update.test.mjs'), path.join(ROOT, 'tests/nakama-reference.test.mjs'), path.join(ROOT, 'tests/godot-tests.test.mjs'), path.join(ROOT, 'tests/spec.test.mjs')]);
           compose(envFile, ['config', '--quiet']); compose(envFile, ['config', '--quiet'], { production: true });
           run('bash', ['-n', path.join(ROOT, 'infra/deploy-remote.sh')]); godotCheck(env); break;
         case 'smoke': {

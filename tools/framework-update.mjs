@@ -50,7 +50,7 @@ export function preserved(file) {
     || file === 'client/config.json' || file === 'framework-update-report.md'
     || /(^|\/)(\.env(?:\..*)?|\.setup|\.git|\.godot|node_modules|exports|backups)(\/|$)/.test(file) && file !== '.env.example'
     || /\.(keystore|jks|p12|p8|mobileprovision|pem|key)$/.test(file)
-    || /^(client\/game|assets)(\/|$)/.test(file);
+    || /^(client\/game|assets|openspec)(\/|$)/.test(file);
 }
 
 export function inspectUpdate({ root = ROOT, repository = REPOSITORY, to, baseline, fetch = true } = {}) {

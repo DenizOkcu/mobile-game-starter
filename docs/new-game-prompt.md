@@ -2,6 +2,8 @@
 
 > Read AGENTS.md, README.md, docs/nakama-feature-map.md and docs/architecture.md. My game idea is: **[idea]**.
 >
+> Use the mobile-spec-workflow skill for meaningful behavior changes. Explore uncertain mechanics first, keep specs and design concise, and record verification with tasks. This request authorizes implementation after the necessary planning; ask only about material missing decisions.
+>
 > Build the smallest playable mobile loop inside client/game. Reuse the existing auth, menu, account, settings and backend. Read docs/setup/visual-assets.md and invoke your imagegen skill for coherent game artwork, UI skins, icons and splash art. Generate and integrate real assets; do not replace game objects or UI art with primitive shapes, procedural drawing, emoji or default-widget-only screens. Keep native controls, live text and invisible collision/hit regions in code. Keep portrait touch controls and make the core interaction work with a mouse in the editor.
 >
 > Before designing backend features, use the nakama-feature-planning skill. Map my vocabulary to behavior and native Nakama capabilities: a persistent clan, guild or fellowship should use Groups; a temporary connected team may use Parties; an NPC roster should use game state. Reuse native services and add only missing game rules.

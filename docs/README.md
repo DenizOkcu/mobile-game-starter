@@ -15,7 +15,7 @@ Open `http://127.0.0.1:8080`. Opening `index.html` directly also works; if the
 browser denies clipboard access, copy buttons select the text for manual copying.
 
 You can serve `docs/` as a static site. Adding these files does not configure
-hosting or deployment. The main guides are part of the HTML page; links to
+hosting or deployment. The main guides are part of the HTML hub, with a dedicated `spec-workflow.html` walkthrough recommended after getting started; links to
 Markdown files open the detailed source documents.
 
 ## Keep content aligned with behavior
@@ -26,6 +26,7 @@ We maintain the HTML by hand. When behavior changes, update the matching section
 | --- | --- |
 | Overview and quickstart | `README.md`, `client/game/game.gd` |
 | Guided setup | `start-here.md`, `../.agents/skills/` |
+| Spec-driven development | `spec-workflow.html`, `spec-workflow.md`, `../.agents/skills/mobile-spec-workflow/`, `../.claude/commands/sdd.md`, `../.cursor/commands/sdd.md` |
 | Add your game idea | `new-game-prompt.md`, `../AGENTS.md` |
 | Command reference | `../tools/manage.mjs` |
 | Nakama API and implementation knowledge | `nakama/README.md`, `nakama/implementation-guide.md`, generated references from `../tools/nakama-reference.mjs` |

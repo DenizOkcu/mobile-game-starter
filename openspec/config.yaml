@@ -1,0 +1,39 @@
+schema: spec-driven
+
+context: |
+  Mobile Game Starter is a Godot mobile prototype framework with the official
+  Nakama Godot SDK and an ES5 TypeScript Nakama runtime. Read AGENTS.md and
+  docs/spec-workflow.md; follow relevant architecture/setup guidance by reference.
+  Keep changes small, use native Nakama capabilities, and preserve existing players.
+  Users drive the workflow through /sdd actions in their LLM (Codex uses the shared skill).
+  The agent runs node tools/spec.mjs internally; no global OpenSpec install is needed.
+  Current behavior lives in openspec/specs; proposed changes live in openspec/changes.
+  Game specs, config, and change history are game-owned during framework upgrades.
+  Explore uncertain gameplay before promising detailed requirements. Routine fixes
+  need only update affected scenarios and meaningful regression coverage.
+
+rules:
+  proposal:
+    - Keep the problem, player outcome, scope and non-goals concise; identify affected capabilities.
+  specs:
+    - Write observable requirements with SHALL or MUST and concrete Given/When/Then scenarios.
+    - Cover failures, offline/resume behavior, account boundaries and replay only where relevant.
+    - Keep implementation details in design and reference existing behavior instead of duplicating it.
+  design:
+    - Use the nakama-feature-planning skill before backend design; verify selected APIs against pinned sources.
+    - State authority, persistence, concurrency/idempotency and migration decisions when relevant.
+    - Address mobile input/layout and generated visual assets when the feature changes visible gameplay.
+    - Keep simple designs short; omit inapplicable sections and avoid speculative abstractions.
+  tasks:
+    - Each task names an observable completion check; keep evidence alongside the relevant task.
+    - Distinguish automated checks from device, signing and deployment checks; leave required unverified work open.
+
+operations:
+  apply:
+    guidance:
+      - Reuse explicit authorization to implement; ask only for material missing decisions.
+      - Run focused behavior checks, then the repository check and relevant smoke tests.
+  archive:
+    guidance:
+      - Read verification evidence before claiming completion. Spec validation checks structure, not implementation.
+      - Keep required incomplete tasks visible; record optional follow-ups separately without claiming they passed.

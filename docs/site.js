@@ -34,22 +34,24 @@ const reset = document.getElementById("demo-reset");
 const coins = document.getElementById("demo-coins");
 const demoState = document.getElementById("demo-state");
 const device = document.querySelector(".device");
-activate.hidden = false;
-reset.hidden = false;
-activate.addEventListener("click", () => {
-  coins.textContent = "10";
-  activate.textContent = "Beacon active · reward claimed";
-  activate.disabled = true;
-  demoState.textContent = "Tutorial complete. Reward granted once.";
-  device.classList.add("is-active");
-});
-reset.addEventListener("click", () => {
-  coins.textContent = "0";
-  activate.textContent = "Activate beacon · +10 coins";
-  activate.disabled = false;
-  demoState.textContent = "Example reset. Try the first action again.";
-  device.classList.remove("is-active");
-});
+if (activate && reset && coins && demoState && device) {
+  activate.hidden = false;
+  reset.hidden = false;
+  activate.addEventListener("click", () => {
+    coins.textContent = "10";
+    activate.textContent = "Beacon active · reward claimed";
+    activate.disabled = true;
+    demoState.textContent = "Tutorial complete. Reward granted once.";
+    device.classList.add("is-active");
+  });
+  reset.addEventListener("click", () => {
+    coins.textContent = "0";
+    activate.textContent = "Activate beacon · +10 coins";
+    activate.disabled = false;
+    demoState.textContent = "Example reset. Try the first action again.";
+    device.classList.remove("is-active");
+  });
+}
 
 // Track the current guide without a scroll handler or changing browser history.
 if ("IntersectionObserver" in window) {

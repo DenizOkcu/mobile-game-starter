@@ -3,6 +3,10 @@
 ## Goal
 Turn a game idea into a small playable mobile prototype. Preserve the working account, menu, settings, environment, and deployment foundation. Use KISS, DRY and YAGNI: use the official Nakama Godot SDK and TypeScript runtime. Avoid speculative abstractions, extra packages, generic event buses, or service layers.
 
+## Spec-driven feature work
+
+Use `.agents/skills/mobile-spec-workflow/SKILL.md` and `docs/spec-workflow.md` for meaningful behavior changes or explicit specification work. Users drive the workflow with `/sdd setup|explore|plan|implement|verify|finish` in Claude Code/Cursor, or the shared skill in Codex. Route these actions through the skill and run CLI/setup/checks internally; do not make terminal commands the user’s SDD routine. Keep exploration and routine fixes lightweight. Read relevant current specs before design, record proposed behavior in change deltas, and tie completion to verification evidence. Reuse explicit implementation authorization; writing a plan does not require asking again. Existing setup, Nakama, artwork and deployment rules still apply.
+
 ## Setup interviews and visual requirements
 
 Start onboarding at `docs/start-here.md`. Use the repo-local skill for the requested workflow; read its SKILL.md directly if skill discovery has not refreshed:

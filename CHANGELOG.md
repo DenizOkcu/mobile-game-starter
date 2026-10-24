@@ -4,6 +4,9 @@ Framework versions are independent of game app versions and player-state schema 
 
 ## Unreleased
 
+- Drive SDD through LLM chat actions with thin `/sdd` adapters for Claude Code/Cursor and the shared Codex skill. Agents handle installation and verification; document each client’s supported entry point.
+- Add a lean repository-local OpenSpec workflow, four behavioral baseline specs, and an exact development-only CLI pin. Normal checks validate specs and archived task completion. Preserve game-owned OpenSpec files through framework updates and exclude them from mobile exports. Older games need the reviewed first-adoption step in the upgrade guide; development tooling now requires Node.js 22.13+ or a newer LTS (24+).
+
 - Retain recoverable credentials when a rejected access token is followed by a refresh outage; expose the refresh error and retry only after successful refresh.
 - Isolate Godot checks and smoke tests from developer user data, enforce process deadlines, and clean temporary files after failures. Live tests stop at failed authentication prerequisites and attempt cleanup of their disposable accounts.
 

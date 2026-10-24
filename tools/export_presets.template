@@ -6,7 +6,7 @@ dedicated_server=false
 export_filter="all_resources"
 export_files=PackedStringArray("res://client/config.json")
 include_filter="LICENSE,client/config.json,addons/com.heroiclabs.nakama/LICENSE"
-exclude_filter="framework*.json,framework-update-report.md,CHANGELOG.md,.env*,server/*,infra/*,tools/*,tests/*,docs/*,backups/*,.agents/*,.setup/*"
+exclude_filter="framework*.json,framework-update-report.md,CHANGELOG.md,.env*,server/*,infra/*,tools/*,tests/*,docs/*,openspec/*,backups/*,.agents/*,.claude/*,.cursor/*,.setup/*"
 export_path="exports/android/prototype.apk"
 
 [preset.0.options]
@@ -26,7 +26,7 @@ dedicated_server=false
 export_filter="all_resources"
 export_files=PackedStringArray("res://client/config.json")
 include_filter="LICENSE,client/config.json,addons/com.heroiclabs.nakama/LICENSE"
-exclude_filter="framework*.json,framework-update-report.md,CHANGELOG.md,.env*,server/*,infra/*,tools/*,tests/*,docs/*,backups/*,.agents/*,.setup/*"
+exclude_filter="framework*.json,framework-update-report.md,CHANGELOG.md,.env*,server/*,infra/*,tools/*,tests/*,docs/*,openspec/*,backups/*,.agents/*,.claude/*,.cursor/*,.setup/*"
 export_path="exports/ios/prototype.zip"
 
 [preset.1.options]

@@ -8,6 +8,10 @@ Open your new clone in your coding assistant and say:
 
 The setup skills live in `.agents/skills/`, so they stay with each new game. If your assistant discovers repository skills, you can ask for `$mobile-local-setup`, `$mobile-production-setup`, `$mobile-android-export`, or `$mobile-ios-export`. Otherwise, tell it to read the matching `SKILL.md` directly. Both methods use the same instructions, without a global install or a path tied to your machine.
 
+## After your first local run
+
+Once Godot talks to local Nakama and the beacon reward survives a restart, continue with the [recommended spec-driven development flow](spec-workflow.html). It walks you through planning one small feature, implementing it, recording verification, and keeping your game's specs current. Use `/sdd` in Claude Code or Cursor, or select `mobile-spec-workflow` through Codex’s `/skills`; the LLM handles the tooling. Routine fixes and uncertain experiments can stay lightweight.
+
 | You want to… | Entry point |
 | --- | --- |
 | Run the starter on your computer | [Local development interview](../.agents/skills/mobile-local-setup/SKILL.md) |
@@ -16,6 +20,7 @@ The setup skills live in `.agents/skills/`, so they stay with each new game. If 
 | Build/run iOS in Xcode | [iOS export interview](../.agents/skills/mobile-ios-export/SKILL.md) |
 | Choose native Nakama features for your game | [Feature-planning skill](../.agents/skills/nakama-feature-planning/SKILL.md) and [concept map](nakama-feature-map.md) |
 | Update a game from an older starter | [Framework update skill](../.agents/skills/mobile-framework-update/SKILL.md) and [upgrade guide](framework-updates.md) |
+| Specify and implement a feature | [SDD walkthrough](spec-workflow.html) and the `mobile-spec-workflow` skill |
 | Turn an idea into a prototype | [Game prompt](new-game-prompt.md), after local setup works |
 
 The assistant asks a few questions at a time, checks what is installed, and saves progress without secrets under ignored `.setup/`. Say "resume local setup" or "resume the Android interview" to continue. Keep private keys, passwords, account tokens, and keystores out of chat. The assistant will help you set them on your machine.

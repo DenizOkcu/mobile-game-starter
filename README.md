@@ -2,7 +2,7 @@
 
 The [website and documentation](docs/index.html) cover setup, game development, mobile exports, and backend deployment. To preview the website locally, see [docs/README.md](docs/README.md).
 
-Mobile Game Starter is a kit for building mobile game prototypes, on your own or with a coding assistant. It uses Godot 4.7.2, typed GDScript, Nakama TypeScript, PostgreSQL, and Docker Compose. Node.js tooling has no extra dependencies, and a Bash script handles deployment. The official Nakama Godot SDK is pinned, and TypeScript compiles the backend directly without a bundler.
+Mobile Game Starter is a kit for building mobile game prototypes, on your own or with a coding assistant. It uses Godot 4.7.2, typed GDScript, Nakama TypeScript, PostgreSQL, and Docker Compose. Node.js tooling uses built-ins, with OpenSpec as a separately pinned development dependency; a Bash script handles deployment. The official Nakama Godot SDK is pinned, and TypeScript compiles the backend directly without a bundler.
 
 The kit includes guest access, email registration and login, guest-to-email linking, session restore using refresh tokens, logout, and account deletion. It also has a main menu, account and profile screen, device settings for volume, haptics, and reduced motion, and a game scene you can replace. The tutorial grants a reward once per account: the client sends an action, the server updates the player record, and the client receives the saved state.
 
@@ -20,7 +20,7 @@ The [visual asset policy](docs/setup/visual-assets.md) requires the imagegen ski
 
 ## Start locally
 
-Prerequisites: Godot 4.7.2, Node.js 22+ with npm, Bash, Docker with Compose v2 supporting `up --wait`, and OpenSSH/tar for VPS deployment. On Windows, use a consistent WSL2 setup or a verified Git Bash toolchain.
+Prerequisites: Godot 4.7.2, Node.js 22.13+ or a newer LTS (24+) with npm, Bash, Docker with Compose v2 supporting `up --wait`, and OpenSSH/tar for VPS deployment. On Windows, use a consistent WSL2 setup or a verified Git Bash toolchain.
 
 ```sh
 node tools/manage.mjs init
@@ -53,6 +53,10 @@ Local API: <http://127.0.0.1:7350>. Console: <http://127.0.0.1:7351>, username `
 For a physical Android device, set `LOCAL_BIND_IP=0.0.0.0` and `CLIENT_API_URL=http://YOUR_COMPUTER_LAN_IP:7350`, then run `up`. The device needs the same LAN and firewall access. Android emulator can use `http://10.0.2.2:7350`. Plain HTTP is for development; iOS should use a valid HTTPS endpoint. See [mobile setup](docs/mobile.md).
 
 For help with mobile exports, use the [Android](.agents/skills/mobile-android-export/SKILL.md) or [iOS](.agents/skills/mobile-ios-export/SKILL.md) skill. Optional fields in `.env.example` set the app version, team, and asset paths. Signing passwords stay out of generated presets. With the SDK and templates installed, `node tools/export.mjs --env-file .env android-debug` produces a debug APK. On macOS, `ios-project` exports an Xcode project. The helper does not publish or upload builds.
+
+## Spec-driven features
+
+For meaningful feature work, use `/sdd setup`, `/sdd plan <feature>`, `/sdd implement`, `/sdd verify`, and `/sdd finish` in Claude Code or Cursor. The LLM runs the tooling. In Codex, select `mobile-spec-workflow` through `/skills` or invoke `$mobile-spec-workflow` with the same action. Routine fixes stay lightweight. OpenSpec is pinned locally; no global install is needed. The assistant installs the pinned development tooling when needed. After the first local run, follow [the SDD walkthrough](docs/spec-workflow.html).
 
 ## Add a game idea
 

@@ -43,6 +43,7 @@ test('configure renders public metadata without signing secrets', t => {
   const preset = fs.readFileSync(path.join(root, 'export_presets.cfg'), 'utf8');
   assert.match(preset, /version\/code=42/); assert.match(preset, /application\/app_store_team_id="TEAM123456"/);
   assert.match(preset, /application\/export_project_only=true/); assert.ok(!preset.includes('@ANDROID_OPTIONS@'));
+  assert.equal((preset.match(/openspec\/\*/g) || []).length, 2, 'Both mobile export presets exclude specification artifacts');
   for (const file of ['export_presets.cfg', 'project.godot', 'client/config.json']) assert.ok(!fs.readFileSync(path.join(root, file), 'utf8').includes('never-serialize-this-password'));
 });
 test('legacy env is supported and assets cannot escape root', t => {

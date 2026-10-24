@@ -22,18 +22,19 @@ function fixture(t) {
   put(upstream, 'CHANGELOG.md', '# 0.1.0\nNo migrations.\n');
   put(upstream, 'client/core/backend.gd', 'header\n\n\n\n\n\nfooter\n');
   put(upstream, 'server/src/main.ts', 'original\n');
-  for (const file of ['client/game/game.gd', 'assets/icon.png', 'export_presets.cfg', '.env.example']) put(upstream, file, 'original\n');
+  for (const file of ['client/game/game.gd', 'assets/icon.png', 'export_presets.cfg', '.env.example', 'openspec/config.yaml', 'openspec/specs/game/spec.md', 'openspec/changes/archive/old/tasks.md']) put(upstream, file, 'original\n');
   const baseline = commit(upstream); git(upstream, 'tag', 'v0.1.0');
   // Copy tracked files into an unrelated history, just like GitHub templates.
   for (const file of git(upstream, 'ls-files').split('\n')) put(root, file, fs.readFileSync(path.join(upstream, file)));
   git(root, 'init', '-b', 'main'); commit(root); recordFrameworkBaseline(root); commit(root);
   put(root, 'client/core/backend.gd', 'game header\n\n\n\n\n\nfooter\n');
-  put(root, 'client/game/game.gd', 'my gameplay\n'); put(root, '.env', 'private-value\n');
+  put(root, 'client/game/game.gd', 'my gameplay\n'); put(root, 'openspec/specs/game/spec.md', 'my game requirements\n'); put(root, 'openspec/config.yaml', 'my game context\n'); put(root, '.env', 'private-value\n');
   commit(root);
   put(upstream, 'framework.json', '{"format":1,"version":"0.1.1"}\n');
   put(upstream, 'CHANGELOG.md', '# 0.1.1\nAuth fix. No migrations.\n');
   put(upstream, 'client/core/backend.gd', 'header\n\n\n\n\n\nfixed footer\n');
-  for (const file of ['client/game/game.gd', 'assets/icon.png', 'export_presets.cfg', '.env.example']) put(upstream, file, 'upstream changed\n');
+  for (const file of ['client/game/game.gd', 'assets/icon.png', 'export_presets.cfg', '.env.example', 'openspec/config.yaml', 'openspec/specs/game/spec.md', 'openspec/changes/archive/old/tasks.md']) put(upstream, file, 'upstream changed\n');
+  put(upstream, 'openspec/changes/framework-only/proposal.md', 'upstream work\n');
   const target = commit(upstream); git(upstream, 'tag', 'v0.1.1');
   return { root, upstream, baseline, target };
 }
@@ -43,14 +44,15 @@ test('template history is identified; preview is read-only and selects latest co
   const plan = inspectUpdate({ root: f.root, repository: f.upstream });
   assert.equal(plan.from, f.baseline); assert.equal(plan.target, f.target); assert.equal(plan.release, 'v0.1.1');
   assert.equal(git(f.root, 'status', '--porcelain'), ''); assert.equal(git(f.root, 'rev-parse', 'HEAD'), before);
-  assert.ok(plan.skipped.includes('client/game/game.gd')); assert.ok(plan.selected.includes('.env.example'));
+  assert.ok(plan.skipped.includes('client/game/game.gd')); assert.ok(plan.skipped.includes('openspec/changes/framework-only/proposal.md')); assert.ok(plan.selected.includes('.env.example'));
 });
 test('three-way update preserves game customizations, secrets, assets and generated files', t => {
   const f = fixture(t); const plan = inspectUpdate({ root: f.root, repository: f.upstream });
   applyUpdate(plan, f);
   assert.equal(fs.readFileSync(path.join(f.root, 'client/core/backend.gd'), 'utf8'), 'game header\n\n\n\n\n\nfixed footer\n');
-  for (const [file, contents] of [['client/game/game.gd', 'my gameplay\n'], ['.env', 'private-value\n'], ['assets/icon.png', 'original\n'], ['export_presets.cfg', 'original\n']]) assert.equal(fs.readFileSync(path.join(f.root, file), 'utf8'), contents);
+  for (const [file, contents] of [['client/game/game.gd', 'my gameplay\n'], ['.env', 'private-value\n'], ['assets/icon.png', 'original\n'], ['export_presets.cfg', 'original\n'], ['openspec/config.yaml', 'my game context\n'], ['openspec/specs/game/spec.md', 'my game requirements\n'], ['openspec/changes/archive/old/tasks.md', 'original\n']]) assert.equal(fs.readFileSync(path.join(f.root, file), 'utf8'), contents);
   assert.equal(fs.readFileSync(path.join(f.root, '.env.example'), 'utf8'), 'upstream changed\n');
+  assert.ok(!fs.existsSync(path.join(f.root, 'openspec/changes/framework-only/proposal.md')));
   const lock = path.join(f.root, 'framework.lock.json'); const before = fs.readFileSync(lock, 'utf8');
   assert.throws(() => finishUpdate({ root: f.root, validate: () => { throw new Error('failed smoke'); } }), /failed smoke/);
   assert.equal(fs.readFileSync(lock, 'utf8'), before);

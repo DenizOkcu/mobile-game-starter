@@ -19,7 +19,7 @@ Use existing answers/evidence. Inspect repo status, the configured Godot version
 
 ## Round 2 — verify tools before installing
 
-Check the Godot executable/version, matching export templates only if exporting, Node 22+ and npm, Bash, Git, Docker daemon, and Compose v2 with `up --wait` support. Useful read-only checks:
+Check the Godot executable/version, matching export templates only if exporting, Node 22.13+ or a newer LTS (24+) and npm, Bash, Git, Docker daemon, and Compose v2 with `up --wait` support. Useful read-only checks:
 
 ```sh
 node --version
@@ -62,7 +62,7 @@ Open `project.godot`, press F5, explicitly choose guest access, enter Play, and 
 
 ## Handoff
 
-Local readiness means daemon/Compose verified, env validated, services healthy, check/smoke passed, and an editor/device run observed or explicitly marked pending. Give `up`, `logs`, `status`, `down` commands and explain that `down` preserves data. Then ask for the game idea or route to export/production. New visible game/UI assets must use the imagegen skill under `docs/setup/visual-assets.md`; the starter's default controls are scaffolding.
+Local readiness means daemon/Compose verified, env validated, services healthy, check/smoke passed, and an editor/device run observed or explicitly marked pending. Give `up`, `logs`, `status`, `down` commands and explain that `down` preserves data. After the first local run, recommend the [SDD walkthrough](../../../docs/spec-workflow.html) for the first meaningful game feature: `/sdd setup` and `/sdd plan <idea>` in Claude Code/Cursor, or `/skills` → `mobile-spec-workflow` in Codex. The LLM handles the tooling. Ask for the game idea or honor an already selected export/production next step. New visible game/UI assets must use the imagegen skill under `docs/setup/visual-assets.md`; the starter's default controls are scaffolding.
 
 Sources: [Docker installation](https://docs.docker.com/get-started/get-docker/), [Nakama Docker setup](https://heroiclabs.com/docs/nakama/getting-started/install/docker/), and the repo's README/architecture.
 
