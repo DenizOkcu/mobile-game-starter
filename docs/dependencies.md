@@ -18,3 +18,9 @@ To update, choose an official release, download it, and verify and record its ch
 `server/package.json` and `package-lock.json` pin TypeScript **5.9.3** and the official `nakama-runtime` type definitions from heroiclabs/nakama-common commit `92cea75d05e5593decaeba37d5c3fca6802705b7`. These types describe Nakama's embedded JavaScript API without adding a runtime dependency. The lockfile records package integrity information.
 
 Use `npm --prefix server ci --ignore-scripts` for reproducible installs. `server/.npmrc` disables install scripts and allows only direct remote dependencies, which npm 12 needs for the pinned official types tarball. Neither the runtime container nor the game export includes npm dependencies.
+
+## API knowledge and upstream checks
+
+The [knowledge entry point](nakama/README.md) records the dated upstream release check, source hierarchy, generated SDK/runtime inventories and known compatibility gaps. Server implementation links use an immutable commit resolved from the default release tag; TypeScript types stay pinned to the commit above. Neither a matching release number nor a compiling method proves end-to-end support across all layers.
+
+After a dependency change, run `node tools/nakama-reference.mjs` and review the generated diff. If the default server version changes, explicitly refresh its implementation index with `node tools/nakama-reference.mjs --refresh-server`. The standard `check` command verifies these references offline after installing the locked compiler/types. Read the gap report before using an API whose declarations and implementation differ. No SDK/server upgrade is performed by reference generation.

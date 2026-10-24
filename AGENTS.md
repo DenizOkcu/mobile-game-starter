@@ -22,9 +22,9 @@ For framework updates, use `.agents/skills/mobile-framework-update/SKILL.md` and
 
 ## Prefer native Nakama features
 
-Before designing a backend feature, read `docs/nakama-feature-map.md` and use `.agents/skills/nakama-feature-planning/SKILL.md`. Interpret behavior, not just the developer's label: a durable fellowship/guild/coven is usually a Nakama Group; a temporary expedition crew may be a Party; an NPC roster is game state. Ask only about ambiguities that affect the design.
+Before designing or implementing a backend feature, read `docs/nakama-feature-map.md` and `docs/nakama/README.md` and use `.agents/skills/nakama-feature-planning/SKILL.md`. Interpret behavior, not just the developer's label: a durable fellowship/guild/coven is usually a Nakama Group; a temporary expedition crew may be a Party; an NPC roster is game state. Ask only about ambiguities that affect the design.
 
-Map the request to native capabilities before adding custom tables, services or RPCs. Reuse the official SDK and native permissions/IDs; add only the game's policy and state. Keep one authoritative membership/balance/score source and guard all native entry paths when imposing custom rules. Verify API support in the pinned server, SDK and runtime types. Do not implement every capability just because it appears in the guide.
+Map the request to native capabilities before adding custom tables, services or RPCs. Reuse the official SDK and native permissions/IDs; add only the game's policy and state. Keep one authoritative membership/balance/score source and guard all native entry paths when imposing custom rules. Verify API support in the pinned server, SDK and runtime types using the generated references and implementation links under `docs/nakama/`. Read only the relevant sections; check `api-gaps.md` for source/type differences. Recheck official releases when asked about current support; do not assume a type or online example proves runtime availability. Do not implement every capability just because it appears in the guide.
 
 ## Read first
 - `README.md` for commands and scope.

@@ -56,7 +56,7 @@ For help with mobile exports, use the [Android](.agents/skills/mobile-android-ex
 
 ## Add a game idea
 
-Before designing backend features, the assistant follows the [Nakama feature map](docs/nakama-feature-map.md) and [feature-planning skill](.agents/skills/nakama-feature-planning/SKILL.md). It maps behavior rather than names: a persistent clan, guild or fellowship reuses Groups, while temporary teams may use Parties. Only game-specific rules are added.
+Before designing backend features, the assistant follows the [Nakama feature map](docs/nakama-feature-map.md) and [feature-planning skill](.agents/skills/nakama-feature-planning/SKILL.md). The [Nakama knowledge guide](docs/nakama/README.md) provides complete pinned API inventories, implementation links and compatibility gaps without loading the whole API into every task. It maps behavior rather than names: a persistent clan, guild or fellowship reuses Groups, while temporary teams may use Parties. Only game-specific rules are added.
 
 Give your coding assistant [AGENTS.md](AGENTS.md) and your idea using [the starter prompt](docs/new-game-prompt.md). Build your loop in `client/game/game.tscn` and `game.gd`, keeping the accounts and menus. Add a specific server action to `server/src/main.ts` when gameplay needs saved state. The included `complete_tutorial` action shows one state change; it is not a general API for submitting scores or claiming rewards.
 

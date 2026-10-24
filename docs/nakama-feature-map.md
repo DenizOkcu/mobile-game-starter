@@ -2,7 +2,9 @@
 
 Read this **before designing any backend feature**. Prefer a fitting Nakama capability, then add only the game's rules around it. Keep the developer's vocabulary in the UI and domain code. “Fellowship” can be the product name of a Nakama Group; it does not justify a second membership database.
 
-These are design recommendations based on the linked official documentation, reviewed on 22 October 2026. They describe capabilities to reuse **when requested**, not extra features already implemented in this starter. Current integration is accounts, sessions and private player-state RPCs. Check the pinned server, runtime types and vendored Godot SDK before using newer APIs.
+These are design recommendations based on the linked official documentation, reviewed on 24 October 2026. They describe capabilities to reuse **when requested**, not extra features already implemented in this starter. Current integration is accounts, sessions and private player-state RPCs. Check the pinned server, runtime types and vendored Godot SDK before using newer APIs.
+
+For implementation, start with the [Nakama knowledge entry point](nakama/README.md). It routes to complete generated SDK/runtime inventories, exact implementation links and a source/type gap report. Read only the needed sections. Availability is separate from this starter’s integrated features.
 
 ## Translate requirements before picking an API
 
@@ -37,6 +39,7 @@ Do not create a new spec document for every small edit. Explain any custom repla
 | Tavern chat, whisper, fellowship channel, world chat | [Chat channels](https://heroiclabs.com/docs/nakama/concepts/chat/) | Moderation policy and UI; choose room, group, or direct channel |
 | Green online dot, “in battle”, live friend activity | [Status/presence](https://heroiclabs.com/docs/nakama/concepts/status/) | Display semantics; durable history is a separate requirement |
 | Find an opponent, queue for a raid, quick play | [Matchmaker](https://heroiclabs.com/docs/nakama/concepts/multiplayer/matchmaker/) | Criteria, team composition and validated match creation |
+| Offline opponents, asynchronous rivals, ghost teams | [Offline matchmaking](https://heroiclabs.com/docs/nakama/concepts/multiplayer/matchmaker/offline-matchmaking/) using Storage Search | Index criteria, durable snapshots, canonical rereads and validated results; not an active socket queue |
 | Room browser, join an existing battle, public game list | [Match listing](https://heroiclabs.com/docs/nakama/concepts/multiplayer/match-listing/) | Labels and join rules; this is different from matching a new set of players |
 | Shared live battle, authoritative duel, co-op simulation | [Authoritative matches](https://heroiclabs.com/docs/nakama/concepts/multiplayer/authoritative/) | Actual game rules and simulation; Nakama is not the Godot physics engine |
 | Casual peer-hosted session with accepted client trust | [Relayed matches](https://heroiclabs.com/docs/nakama/concepts/multiplayer/relayed/) | Peer-hosted game logic; relaying does not validate results |
@@ -47,6 +50,10 @@ Do not create a new spec document for every small edit. Explain any custom repla
 | Gold, gems, credits, spendable numeric resources | [Virtual wallets](https://heroiclabs.com/docs/nakama/concepts/user-accounts/#virtual-wallet) and optional ledger | Price, earning/spending rules, caps and idempotent fulfillment |
 | In-game inbox, royal dispatch, invite notice, announcement | [In-app notifications](https://heroiclabs.com/docs/nakama/concepts/notifications/) | Persistent claim state and attachments; notification delivery does not grant a prize |
 | Buy gems, validate a store purchase, restore paid entitlement | [IAP validation](https://heroiclabs.com/docs/nakama/concepts/iap-validation/) | Native store checkout, product mapping and idempotent entitlement fulfillment |
+| Subscription entitlements, restore paid access, refund/revocation handling | Native subscription validation, stored purchase/subscription records and provider notifications | Store checkout/plugins, once-only fulfillment and lifecycle policy; verify SDK/runtime gaps |
+| Custom event ingestion, analytics forwarding, counters and timings | [Events](https://heroiclabs.com/docs/nakama/concepts/events/), runtime metrics and logger | Event trust, delivery/processing support and external analytics integration |
+| Advanced server-managed presence or custom realtime distribution | [Streams](https://heroiclabs.com/docs/nakama/server-framework/streams/) | Stream identity/access rules; prefer chat/parties/matches when they fit |
+| External identity platform beyond built-in login methods | [Auth providers](https://heroiclabs.com/docs/nakama/concepts/authentication/authentication-providers/) | Verify server implementation, registration/types and SDK gaps before choosing an integration |
 | Level-gated creation/joining, validation before a built-in action | [Runtime hooks](https://heroiclabs.com/docs/nakama/server-framework/introduction/hooks/) | Narrow policies using native operations; do not replace the whole service |
 
 ## Persistent fellowship vs temporary party
@@ -61,7 +68,7 @@ Parties are connection-oriented teams, removed when everyone leaves. Keep a pers
 
 ## Pick the right multiplayer pieces
 
-“Lobby” might mean a temporary party, a browser of active matches, a chat room, or a ready phase inside an authoritative match. Map those behaviors separately. Matchmaking finds compatible players; it is not the simulation or permission to join any game. Active matchmaking needs a socket; disconnected, asynchronous-opponent use cases need an explicitly designed persistent flow instead. [Matchmaker](https://heroiclabs.com/docs/nakama/concepts/multiplayer/matchmaker/), [match listing](https://heroiclabs.com/docs/nakama/concepts/multiplayer/match-listing/)
+“Lobby” might mean a temporary party, a browser of active matches, a chat room, or a ready phase inside an authoritative match. Map those behaviors separately. Matchmaking finds compatible players; it is not the simulation or permission to join any game. Active matchmaking needs a socket; disconnected, asynchronous-opponent use cases can use the documented offline-matchmaking composition over Storage Search, with explicit persistent snapshots and validation. [Matchmaker](https://heroiclabs.com/docs/nakama/concepts/multiplayer/matchmaker/), [match listing](https://heroiclabs.com/docs/nakama/concepts/multiplayer/match-listing/)
 
 Use authoritative match handlers when live shared rules/results need server validation; implement the game's transitions there. Do not introduce a second WebSocket server merely because the match is called a “dungeon”. Relayed matches only forward data and are not anti-cheat validation. Turns submitted hours apart can use versioned Storage + RPCs without keeping an empty live match running. [Authoritative multiplayer](https://heroiclabs.com/docs/nakama/concepts/multiplayer/authoritative/), [relayed multiplayer](https://heroiclabs.com/docs/nakama/concepts/multiplayer/relayed/)
 
@@ -89,7 +96,7 @@ Heroic Labs also documents Hiro, Satori, Enterprise and hosted products alongsid
 
 ## Implementation contract for this repository
 
-1. Read this mapping and the relevant official concept page, then inspect the local SDK and runtime types for supported signatures. Do not silently upgrade dependencies or patch the vendored addon when a newer API is absent.
+1. Read this mapping, the [knowledge entry point](nakama/README.md), and the relevant official concept page. Search the generated API references, inspect local signatures and linked implementations, and check the gap report. Do not silently upgrade dependencies or patch the vendored addon when a newer API is absent.
 2. Use the existing official SDK for permitted native operations; add focused methods to the existing backend wrapper as needed. A native list/join/read action does not automatically need a new custom RPC or REST service.
 3. Add synchronous TypeScript hooks/RPCs only for missing policy/transitions. The target is Nakama's embedded ES5-compatible runtime, not a Node web server. Guard native entry paths where the rule must apply; server runtime calls require their own authorization checks.
 4. Introduce an official SDK socket only for requested realtime features, preserving HTTP authentication/state access when the socket fails. Handle reconnect, rejoin, missed-history reads and canonical refresh. Never replay uncertain writes on reconnect.
