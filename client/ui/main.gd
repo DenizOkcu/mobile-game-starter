@@ -1,5 +1,7 @@
 extends Control
 
+const TouchTargets = preload("res://client/core/touch_targets.gd")
+
 var margin: MarginContainer
 var content: VBoxContainer
 var status: Label
@@ -17,7 +19,7 @@ func _ready() -> void:
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 32)
 	add_child(margin)
-	get_viewport().size_changed.connect(_safe_area)
+	get_viewport().size_changed.connect(_layout_changed)
 	_safe_area()
 	var scroll := ScrollContainer.new()
 	scroll.follow_focus = true
@@ -32,8 +34,8 @@ func _ready() -> void:
 		await _run(Backend.restore, "menu")
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_RESUMED and is_node_ready() and not pending and not Backend.token.is_empty():
-		_run(Backend.refresh_state, "")
+	if what == NOTIFICATION_APPLICATION_RESUMED and is_node_ready() and not pending and Backend.has_recoverable_session():
+		_run(Backend.recover_session, "menu" if current_screen == "auth" else "")
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST and not pending:
 		_show("menu")
 
@@ -48,7 +50,7 @@ func _label(text: String, size: int = 26) -> Label:
 func _button(text: String, callback: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size.y = 76
+	button.custom_minimum_size.y = 96
 	button.pressed.connect(callback)
 	content.add_child(button)
 	return button
@@ -57,7 +59,7 @@ func _field(placeholder: String, secret: bool = false) -> LineEdit:
 	var field := LineEdit.new()
 	field.placeholder_text = placeholder
 	field.secret = secret
-	field.custom_minimum_size.y = 76
+	field.custom_minimum_size.y = 96
 	content.add_child(field)
 	return field
 
@@ -82,6 +84,7 @@ func _show(screen: String) -> void:
 			game.action_requested.connect(_complete_tutorial)
 			content.add_child(game)
 	status = _label(AppConfig.error_message if not AppConfig.error_message.is_empty() else "", 24)
+	_update_touch_targets.call_deferred()
 
 func _update_player_summary() -> void:
 	if not is_instance_valid(player_summary):
@@ -91,6 +94,8 @@ func _update_player_summary() -> void:
 
 func _auth() -> void:
 	_label("Start a prototype", 32)
+	if Backend.has_recoverable_session():
+		_button("Retry connection", func() -> void: _run(Backend.recover_session, "menu"))
 	_button("Play as guest", func() -> void: _run(Backend.authenticate, "menu"))
 	_label("Or use an email account")
 	var email := _field("Email")
@@ -117,7 +122,7 @@ func _settings() -> void:
 	volume.max_value = 1
 	volume.step = 0.05
 	volume.value = Preferences.volume
-	volume.custom_minimum_size.y = 72
+	volume.custom_minimum_size.y = 96
 	volume.value_changed.connect(func(value: float) -> void:
 		Preferences.volume = value
 		Preferences.save())
@@ -126,7 +131,7 @@ func _settings() -> void:
 		var toggle := CheckButton.new()
 		toggle.text = setting.replace("_", " ").capitalize()
 		toggle.button_pressed = Preferences.get(setting)
-		toggle.custom_minimum_size.y = 76
+		toggle.custom_minimum_size.y = 96
 		toggle.toggled.connect(func(value: bool) -> void:
 			Preferences.set(setting, value)
 			Preferences.save())
@@ -150,7 +155,8 @@ func _account() -> void:
 		dialog.canceled.connect(dialog.queue_free)
 		dialog.confirmed.connect(dialog.queue_free)
 		add_child(dialog)
-		dialog.popup_centered())
+		dialog.popup_centered()
+		_update_touch_targets.call_deferred())
 	_button("Back", func() -> void: _show("menu"))
 
 func _lock(node: Node, locked: bool) -> void:
@@ -211,6 +217,14 @@ func _email_login(email: String, password: String, create: bool) -> void:
 		status.text = "Enter an email and at least 8 password characters."
 		return
 	await _run(Backend.authenticate.bind(email, password, create), "menu")
+
+func _update_touch_targets() -> void:
+	if is_inside_tree():
+		TouchTargets.apply_tree(self)
+
+func _layout_changed() -> void:
+	_safe_area()
+	_update_touch_targets.call_deferred()
 
 func _safe_area() -> void:
 	if not OS.has_feature("mobile"):

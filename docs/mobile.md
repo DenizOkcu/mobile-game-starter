@@ -2,7 +2,7 @@
 
 Use the [Android interview](../.agents/skills/mobile-android-export/SKILL.md) or [iOS interview](../.agents/skills/mobile-ios-export/SKILL.md) for help with prerequisites, private signing, generated branding, and checks on a device. Each asks a few questions at a time.
 
-The client uses a 720×1280 portrait canvas with Compatibility rendering. Controls are large, and screens scroll on short displays. Test touch, keyboard avoidance, safe areas, resume, and network interruptions on the target device. The active game scene stays mounted during resume refreshes. Update game HUD/state observers through `Backend.state_changed` rather than relying on scene recreation. Android system Back navigates through the controller; automatic Back-to-quit is disabled. Mouse emulation is useful while developing, but you still need a device test.
+The client uses a 720×1280 portrait canvas with Compatibility rendering. Native hit regions are at least 48×48 logical units after viewport and mobile display scaling, and screens scroll on short displays. `client/core/touch_targets.gd` converts this floor into each control’s canvas coordinates. Use its `apply_tree` after creating dynamic native controls, and reapply on viewport changes. The 720-wide design uses 96-unit buttons as its 360-wide preview baseline; narrower previews require larger canvas hit areas. Test touch, keyboard avoidance, safe areas, resume, and network interruptions on the target device. The active game scene stays mounted during resume refreshes. Update game HUD/state observers through `Backend.state_changed` rather than relying on scene recreation. Android system Back navigates through the controller; automatic Back-to-quit is disabled. After initial restore fails offline, **Retry connection** and the next resume recover the saved account without switching to a new guest. Mouse emulation is useful while developing, but you still need a device test.
 
 Run `configure` after changing GAME_TITLE, BUNDLE_ID, CLIENT_API_URL, NAKAMA_SERVER_KEY, APP_VERSION/APP_BUILD_NUMBER, team, or asset fields. Both export presets include public config and exclude server files, env files, and tooling. Keep server credentials out of GDScript.
 
@@ -35,3 +35,16 @@ node tools/export.mjs --env-file .env ios-project
 The helper produces APKs or an Xcode project archive. It does not produce AABs or signed IPAs, or upload to stores. It reads Android signing overrides privately from the selected env file and passes them only to Godot's process environment. Add only the optional keys your chosen build needs to an existing `.env` file.
 
 Keep private iOS signing material in Keychain and SDK/JDK locations in the machine's Editor Settings. For AABs, custom signing, or entitlements, follow the interview and extend your game's template with official settings that match the Godot version.
+
+## Device release acceptance
+
+Passing `check` and `smoke` establishes local code/transport behavior. Before calling a game ready for distribution, record separate dated evidence in ignored `.setup/android.md` and `.setup/ios.md` for:
+
+- Exact Git revision, app identity/version, backend environment, build type, device model and OS.
+- A signed build installed on a physical device for each target platform. Distinguish Android debug/release APKs from Play AABs, and an iOS project/simulator run from a signed device/archive build.
+- Clean install, guest/email linking, account switching, interrupted startup and explicit retry, background/resume preserving a run, Android Back, keyboard/safe areas and touch targets on small/notched screens.
+- Release endpoint, signing identity and privacy/store requirements appropriate to the actual game. Keep private credentials out of evidence.
+
+Mark missing devices, SDKs, signing or store prerequisites **pending** or **blocked**, then continue independent work. Use the platform interview to obtain missing information; never infer signing or store-upload authorization from a successful code check. The starter does not supply device evidence or a published game merely by generating a project.
+
+Touch references: [Apple button hit regions](https://developer.apple.com/design/human-interface-guidelines/buttons), [Android touch targets](https://developer.android.com/guide/topics/ui/accessibility/views/apps-views), [Godot display scale](https://docs.godotengine.org/en/stable/classes/class_displayserver.html#class-displayserver-method-screen-get-scale).

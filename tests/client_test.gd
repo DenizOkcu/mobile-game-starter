@@ -1,11 +1,15 @@
 extends SceneTree
 
+const TouchTargets = preload("res://client/core/touch_targets.gd")
+
 class TestClient extends NakamaClient:
 	var frames: SceneTree
 	var session_reply: NakamaSession
 	var snapshot: Dictionary = {"display_name": "Pilot", "coins": 10, "tutorial_completed": true}
 	var rpc_failure: bool = false
 	var rpc_calls: int = 0
+	var refresh_calls: int = 0
+	var refresh_failure: bool = false
 
 	func _init(adapter: NakamaHTTPAdapter, tree: SceneTree) -> void:
 		super(adapter, "test", "http", "127.0.0.1", 7350, 15)
@@ -16,7 +20,10 @@ class TestClient extends NakamaClient:
 		return session_reply
 
 	func session_refresh_async(_session: NakamaSession, _vars = null) -> NakamaSession:
+		refresh_calls += 1
 		await frames.process_frame
+		if refresh_failure:
+			return NakamaSession.new(null, false, null, NakamaException.new("Simulated refresh timeout", 0))
 		return session_reply
 
 	func rpc_async(_session: NakamaSession, _id: String, _payload = null):
@@ -35,7 +42,8 @@ func check(condition: bool, message: String) -> void:
 
 func session_for(user_id: String) -> NakamaSession:
 	var payload := Marshalls.utf8_to_base64(JSON.stringify({"uid": user_id, "exp": int(Time.get_unix_time_from_system()) + 3600}))
-	return NakamaSession.new("test." + payload + ".signature")
+	var token := "test." + payload + ".signature"
+	return NakamaSession.new(token, false, token)
 
 func button_named(node: Node, text: String) -> Button:
 	for child in node.get_children():
@@ -48,6 +56,15 @@ func game_in(main: Control) -> Node:
 		if child.has_signal("action_requested"):
 			return child
 	return null
+
+func check_touch_targets(node: Node, width: int) -> void:
+	if node is BaseButton or node is LineEdit or node is Slider:
+		var control := node as Control
+		var transform := control.get_viewport().get_screen_transform() * control.get_global_transform_with_canvas()
+		var screen_size: Vector2 = (transform * Rect2(Vector2.ZERO, control.size)).size
+		check(screen_size.x >= 47.99 and screen_size.y >= 47.99, "Native touch target meets 48 units at width %d: %s" % [width, control.get_class()])
+	for child in node.get_children():
+		check_touch_targets(child, width)
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -76,7 +93,24 @@ func _run() -> void:
 	check(probe._accept(session_for("second-player"), true) and not probe.state_ready, "Fresh authentication requires another bootstrap even for the same account")
 	client.snapshot = {}
 	check(not await probe.refresh_state() and not probe.state_ready, "Empty snapshots cannot unlock gameplay")
+	var recovering_session := session_for("recovering-player")
+	probe._session = NakamaSession.new(null, false, recovering_session.refresh_token)
+	probe.state = {}
+	probe.state_ready = false
+	client.session_reply = recovering_session
+	client.snapshot = {"display_name": "Recovered", "coins": 0, "tutorial_completed": false}
+	client.refresh_failure = true
+	var refresh_before := client.refresh_calls
+	var rpc_before := client.rpc_calls
+	check(probe.has_recoverable_session(), "A refresh-only session is recoverable")
+	check(not await probe.recover_session(), "Refresh-only recovery reports a network failure")
+	check(probe.token.is_empty() and probe.has_recoverable_session() and not probe.state_ready, "A transient restore failure retains refresh credentials without unlocking the game")
+	check(client.rpc_calls == rpc_before, "Failed credential refresh does not fetch or replay game actions")
+	client.refresh_failure = false
+	check(await probe.recover_session() and probe.state_ready, "Refresh-only recovery succeeds when connectivity returns")
+	check(client.refresh_calls == refresh_before + 2 and probe._session.user_id == "recovering-player", "Recovery retries the existing account instead of creating a guest")
 	probe.free()
+	client.session_reply = session_for("first-player")
 
 	# Use in-memory sessions and transport only; no live accounts or save writes.
 	backend._client = client
@@ -100,7 +134,10 @@ func _run() -> void:
 	check(main.current_screen == "auth", "System Back cannot bypass failed bootstrap")
 
 	client.snapshot = {"display_name": "Pilot", "coins": 0, "tutorial_completed": false}
-	await main._run(backend.refresh_state, "menu")
+	button_named(main.content, "Retry connection").pressed.emit()
+	check(main.pending, "Retry connection enters the serialized request flow")
+	for frame in range(4):
+		await process_frame
 	check(main.current_screen == "menu" and backend.state_ready, "Successful recovery enters the menu")
 	main._show("game")
 	var game := game_in(main)
@@ -141,6 +178,54 @@ func _run() -> void:
 	backend.state = {}
 	main._show("game")
 	check(main.current_screen == "auth", "Invalidated bootstrap closes protected navigation")
+	# Reproduce initial restore timing: credentials remain, but there is no
+	# access token yet. Keep the failure path in memory (no session-file writes).
+	backend._session = NakamaSession.new(null, false, session_for("first-player").refresh_token)
+	client.refresh_failure = true
+	var before_resume_refresh := client.refresh_calls
+	main._show("auth")
+	main._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	main._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	for frame in range(4):
+		await process_frame
+	check(client.refresh_calls == before_resume_refresh + 1, "Resume retries refresh-only credentials exactly once")
+	check(main.current_screen == "auth" and not main.pending and button_named(main.content, "Retry connection") != null, "Failed resume keeps an explicit recovery action")
+	button_named(main.content, "Retry connection").pressed.emit()
+	for frame in range(4):
+		await process_frame
+	check(client.refresh_calls == before_resume_refresh + 2, "Explicit retry also works with refresh-only credentials")
+	client.refresh_failure = false
+	backend._session = session_for("first-player")
+	check(TouchTargets.minimum_for_scale(Vector2(0.5, 0.5)) == Vector2(96, 96), "360-wide previews require 96 design-unit targets")
+	check(TouchTargets.minimum_for_scale(Vector2(1.5, 1.5), 3.0) == Vector2(96, 96), "3x mobile displays retain 48 logical-unit targets")
+	check(TouchTargets.minimum_for_scale(Vector2(2.0, 2.0), 2.0) == Vector2(48, 48), "2x displays convert pixel scale back to logical target size")
+	var original_size := root.size
+	var original_scale_size := root.content_scale_size
+	var original_scale_mode := root.content_scale_mode
+	root.content_scale_size = Vector2i(720, 1280)
+	root.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	for width in [320, 360, 430]:
+		root.size = Vector2i(width, int(width * 1280.0 / 720.0))
+		for screen in ["auth", "settings", "game"]:
+			backend.state_ready = true
+			backend.state = client.snapshot
+			main._show(screen)
+			for frame in range(3):
+				await process_frame
+			check_touch_targets(main, width)
+	main._show("account")
+	button_named(main.content, "Delete account…").pressed.emit()
+	for frame in range(3):
+		await process_frame
+	for child in main.get_children():
+		if child is ConfirmationDialog:
+			check_touch_targets(child, 430)
+			child.queue_free()
+	root.size = original_size
+	root.content_scale_size = original_scale_size
+	root.content_scale_mode = original_scale_mode
+	backend.state_ready = false
+	backend.state = {}
 	backend._session = null
 	backend._client = original_client
 	backend.last_error = ""

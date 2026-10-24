@@ -65,3 +65,9 @@ Open `project.godot`, press F5, explicitly choose guest access, enter Play, and 
 Local readiness means daemon/Compose verified, env validated, services healthy, check/smoke passed, and an editor/device run observed or explicitly marked pending. Give `up`, `logs`, `status`, `down` commands and explain that `down` preserves data. Then ask for the game idea or route to export/production. New visible game/UI assets must use the imagegen skill under `docs/setup/visual-assets.md`; the starter's default controls are scaffolding.
 
 Sources: [Docker installation](https://docs.docker.com/get-started/get-docker/), [Nakama Docker setup](https://heroiclabs.com/docs/nakama/getting-started/install/docker/), and the repo's README/architecture.
+
+## Mobile recovery and touch acceptance
+
+Use `client/core/touch_targets.gd` for native controls and apply it after dynamic UI construction. Require at least 48×48 logical units after viewport and OS display scaling; a 72px canvas target is insufficient at the 720px design width. Check 320-, 360- and 430-wide previews, then verify on the selected device. Preserve existing artwork; invisible hit regions and native controls remain code.
+
+Test offline startup followed by Retry connection/resume, confirming the same account and saved progress return without creating a replacement guest. Report physical-device, signed-build and distribution evidence separately from `check`, `smoke`, resource packs and simulator/project export. Follow the device acceptance section of `docs/mobile.md` and mark missing prerequisites pending rather than claiming release readiness.

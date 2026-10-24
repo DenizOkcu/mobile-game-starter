@@ -59,3 +59,9 @@ Verify installed app identity/version/signature, launcher icon and cold launch/s
 Finish with artifact location, exact build type, signing certificate identity (public fingerprint only), device evidence and remaining release/store tasks. Obtain store-upload authorization only if it is actually requested and still missing.
 
 References: [Godot Android setup](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_android.html), [Android export options](https://docs.godotengine.org/en/stable/classes/class_editorexportplatformandroid.html), [Play signing](https://developer.android.com/studio/publish/app-signing).
+
+## Mobile recovery and touch acceptance
+
+Use `client/core/touch_targets.gd` for native controls and apply it after dynamic UI construction. Require at least 48×48 logical units after viewport and OS display scaling; a 72px canvas target is insufficient at the 720px design width. Check 320-, 360- and 430-wide previews, then verify on the selected device. Preserve existing artwork; invisible hit regions and native controls remain code.
+
+Test offline startup followed by Retry connection/resume, confirming the same account and saved progress return without creating a replacement guest. Report physical-device, signed-build and distribution evidence separately from `check`, `smoke`, resource packs and simulator/project export. Follow the device acceptance section of `docs/mobile.md` and mark missing prerequisites pending rather than claiming release readiness.

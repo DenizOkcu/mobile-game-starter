@@ -88,6 +88,24 @@ func restore() -> bool:
 		return false
 	return await refresh_state()
 
+func has_recoverable_session() -> bool:
+	if _session != null and (not _session.token.is_empty() or not _session.refresh_token.is_empty()):
+		return true
+	var config := ConfigFile.new()
+	return config.load(SESSION_PATH) == OK and config.get_value("session", "api_url", "") == AppConfig.api_url and not str(config.get_value("session", "refresh_token", "")).is_empty()
+
+func recover_session() -> bool:
+	if _client == null:
+		return false
+	if _session != null:
+		if not _session.token.is_empty():
+			return await refresh_state()
+		if not _session.refresh_token.is_empty():
+			if not await _refresh_session():
+				return false
+			return await refresh_state()
+	return await restore()
+
 func authenticate(email: String = "", password: String = "", create: bool = false) -> bool:
 	if _client == null:
 		return false

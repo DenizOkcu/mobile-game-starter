@@ -23,7 +23,7 @@ func _ready() -> void:
 	_sync_state()
 	var back := Button.new()
 	back.text = "Back to menu"
-	back.custom_minimum_size.y = 72
+	back.custom_minimum_size.y = 96
 	back.pressed.connect(func() -> void: back_requested.emit())
 	add_child(back)
 

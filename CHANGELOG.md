@@ -2,6 +2,15 @@
 
 Framework versions are independent of game app versions and player-state schema versions.
 
+## Unreleased
+
+- Block framework update completion after failed/interrupted application until every selected path is reviewed and an explicit manual resolution is recorded. Retain the resolution in the report and baseline metadata; validation remains required.
+- Preview unreleased/newer template baselines without attempting to downgrade to older tags. Report when no forward compatible release exists.
+- Recover refresh-only sessions after offline startup through resume and an explicit Retry connection action, preserving the original account.
+- Enforce 48×48 logical-unit native hit targets across viewport/display scaling, including small layouts and confirmation controls. Update the agent and device acceptance guidance accordingly.
+
+No server RPC, player schema, database, env or dependency migration is required. Existing games should adopt the controller/helper changes and review their custom touch regions. Framework update resolutions from older pending state require the explicit manual review step described in the upgrade guide.
+
 ## 0.1.1
 
 - Refresh server state on resume without recreating the active game scene or discarding its unsaved run state. Update the player summary and example beacon in place.

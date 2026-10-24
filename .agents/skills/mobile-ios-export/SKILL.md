@@ -60,3 +60,9 @@ For distribution, produce and validate an Xcode archive with the correct release
 Handoff: selected env, project/artifact location, public identity/version, verified build/run evidence and pending signing/distribution tasks. No secrets in notes.
 
 References: [Godot iOS setup](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_ios.html), [iOS export options](https://docs.godotengine.org/en/stable/classes/class_editorexportplatformios.html), [Apple signing workflow](https://developer.apple.com/help/account/create-certificates/certificates-overview/).
+
+## Mobile recovery and touch acceptance
+
+Use `client/core/touch_targets.gd` for native controls and apply it after dynamic UI construction. Require at least 48×48 logical units after viewport and OS display scaling; a 72px canvas target is insufficient at the 720px design width. Check 320-, 360- and 430-wide previews, then verify on the selected device. Preserve existing artwork; invisible hit regions and native controls remain code.
+
+Test offline startup followed by Retry connection/resume, confirming the same account and saved progress return without creating a replacement guest. Report physical-device, signed-build and distribution evidence separately from `check`, `smoke`, resource packs and simulator/project export. Follow the device acceptance section of `docs/mobile.md` and mark missing prerequisites pending rather than claiming release readiness.

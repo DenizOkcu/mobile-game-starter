@@ -50,7 +50,7 @@ Map the request to native capabilities before adding custom tables, services or 
 - Runtime TypeScript targets ES5 and runs inside Nakama, not Node.js. Use the official `nkruntime` types; no Node APIs or runtime imports. Register named RPC adapters in `InitModule`.
 - SDK auto-retry and auto-refresh stay disabled: the wrapper refreshes/persists sessions explicitly and never replays unknown writes.
 - Autoload scripts extend Node and have no `class_name`.
-- Use typed GDScript, minimum 24px UI text and 72px touch controls at the 720px design width.
+- Use typed GDScript and minimum 24px UI text at the 720px design width. Interactive hit areas must remain at least 48×48 logical units (Android dp / iOS points) after viewport and display scaling. Use `client/core/touch_targets.gd` for native controls and test 320-, 360- and 430-wide layouts; 96 design units is only the 360-wide baseline, not a density-independent guarantee.
 - Keep gameplay in `client/game`; extract a helper only when it has a real second use or independent domain responsibility.
 - UI emits player intent; server computes persistent rewards and timestamps. Never accept a client balance, score reward, or arbitrary state blob as authority.
 - Read stored versions and use optimistic concurrency on every mutation. Creation uses `version="*"`. Storage is private and server-write-only.
