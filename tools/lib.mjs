@@ -138,7 +138,7 @@ export function run(command, args = [], options = {}) {
     cwd: ROOT, stdio: options.capture ? 'pipe' : ['pipe', 'inherit', 'inherit'],
     encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, ...options,
   });
-  if (result.error) throw new Error(`Unable to run ${command}: ${result.error.code}`);
+  if (result.error && !(options.check === false && result.error.code === 'ETIMEDOUT')) throw new Error(`Unable to run ${command}: ${result.error.code}`);
   if (result.status !== 0 && options.check !== false) throw new Error(`${command} failed (exit ${result.status ?? result.signal})`);
   return result;
 }

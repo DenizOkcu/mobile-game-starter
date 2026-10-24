@@ -2,20 +2,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { godotTests } from './godot-tests.mjs';
 import { frameworkUpdate, recordFrameworkBaseline } from './framework-update.mjs';
-import { ROOT, readEnv, validate, init, configure, run, compose, serverEnvironment, parseArgs, redact } from './lib.mjs';
+import { ROOT, readEnv, validate, init, configure, run, compose, serverEnvironment, parseArgs } from './lib.mjs';
 
 function buildServer() {
   for (const args of [['ci', '--ignore-scripts'], ['run', 'type-check'], ['run', 'build']]) run('npm', ['--prefix', path.join(ROOT, 'server'), ...args]);
 }
 function godotCheck(env) {
-  for (const args of [['--editor', '--import'], ['--script', 'res://tests/client_test.gd', '--', '--test']]) {
-    const result = run(env.GODOT_BIN, ['--headless', '--path', ROOT, ...args], { capture: true, check: false });
-    const output = redact(result.stdout + result.stderr, env);
-    console.log(output);
-    if (result.status !== 0 || output.includes('ERROR:')) throw new Error('Godot validation failed');
-  }
+  godotTests(env, ['client_test.gd']);
 }
+
 function deploy(env, envFile) {
   validate(env, { production: true });
   buildServer(); configure(env);
@@ -63,14 +60,12 @@ try {
         case 'check':
           buildServer(); configure(env);
           run(process.execPath, [path.join(ROOT, 'tools/nakama-reference.mjs'), '--check']);
-          run(process.execPath, ['--test', path.join(ROOT, 'tests/tooling.test.mjs'), path.join(ROOT, 'tests/framework-update.test.mjs'), path.join(ROOT, 'tests/nakama-reference.test.mjs')]);
+          run(process.execPath, ['--test', path.join(ROOT, 'tests/tooling.test.mjs'), path.join(ROOT, 'tests/framework-update.test.mjs'), path.join(ROOT, 'tests/nakama-reference.test.mjs'), path.join(ROOT, 'tests/godot-tests.test.mjs')]);
           compose(envFile, ['config', '--quiet']); compose(envFile, ['config', '--quiet'], { production: true });
           run('bash', ['-n', path.join(ROOT, 'infra/deploy-remote.sh')]); godotCheck(env); break;
         case 'smoke': {
           configure(env); run(process.execPath, [path.join(ROOT, 'tests/integration.mjs'), envFile]);
-          const result = run(env.GODOT_BIN, ['--headless', '--path', ROOT, '--script', 'res://tests/live_client.gd'], { capture: true, check: false });
-          const output = redact(result.stdout + result.stderr, env); console.log(output);
-          if (result.status !== 0 || output.includes('ERROR:')) throw new Error('Live Godot transport check failed');
+          godotTests(env, ['live_client.gd']);
           break;
         }
         case 'deploy': deploy(env, envFile); break;

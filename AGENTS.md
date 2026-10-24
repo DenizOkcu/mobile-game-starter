@@ -58,7 +58,7 @@ Map the request to native capabilities before adding custom tables, services or 
 - If changing schema version, add an explicit migration; never reset existing players silently.
 - All deployment/config values originate in the selected `.env` file. Only `api_url`, public `server_key`, and `game_title` enter `client/config.json`. Never package secrets or source `.env` as shell code.
 - `configure` owns public title/icon/splash and export metadata; edit `tools/export_presets.template`, not just generated presets.
-- Never print secrets or ask for them in chat; read them only inside the required validation/export/deploy tooling. Do not inspect unrelated secrets, change other game repositories, or touch real player saves for tests. Live tests use disposable accounts and restore their temporary session file.
+- Never print secrets or ask for them in chat; read them only inside the required validation/export/deploy tooling. Do not inspect unrelated secrets, change other game repositories, or touch real player saves for tests. Godot tests must run through the isolated, bounded tooling runner; never run their scripts directly against developer user data. Live tests use disposable accounts and attempt cleanup after failed prerequisites.
 - Never use `docker compose down -v` without an explicit request to delete data.
 
 ## Validate

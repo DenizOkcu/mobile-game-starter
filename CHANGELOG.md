@@ -5,6 +5,7 @@ Framework versions are independent of game app versions and player-state schema 
 ## Unreleased
 
 - Retain recoverable credentials when a rejected access token is followed by a refresh outage; expose the refresh error and retry only after successful refresh.
+- Isolate Godot checks and smoke tests from developer user data, enforce process deadlines, and clean temporary files after failures. Live tests stop at failed authentication prerequisites and attempt cleanup of their disposable accounts.
 
 - Block framework update completion after failed/interrupted application until every selected path is reviewed and an explicit manual resolution is recorded. Retain the resolution in the report and baseline metadata; validation remains required.
 - Preview unreleased/newer template baselines without attempting to downgrade to older tags. Report when no forward compatible release exists.

@@ -12,7 +12,9 @@ class TestClient extends NakamaClient:
 	var refresh_failure: bool = false
 	var refresh_failure_status: int = 0
 	var rpc_rejections: int = 0
-
+	var email_login_failure: bool = false
+	var revoked: bool = false
+	var deleted_users: Array[String] = []
 
 	func _init(adapter: NakamaHTTPAdapter, tree: SceneTree) -> void:
 		super(adapter, "test", "http", "127.0.0.1", 7350, 15)
@@ -20,7 +22,30 @@ class TestClient extends NakamaClient:
 
 	func authenticate_email_async(_email: String, _password: String, _username = null, _create: bool = true, _vars = null) -> NakamaSession:
 		await frames.process_frame
+		if email_login_failure:
+			return NakamaSession.new(null, false, null, NakamaException.new("Simulated login outage", 0))
+		revoked = false
 		return session_reply
+
+	func authenticate_device_async(_id: String, _username = null, _create: bool = true, _vars = null) -> NakamaSession:
+		await frames.process_frame
+		return session_reply
+
+	func link_email_async(_session: NakamaSession, _email: String, _password: String) -> NakamaAsyncResult:
+		await frames.process_frame
+		return NakamaAsyncResult.new()
+
+	func session_logout_async(_session: NakamaSession) -> NakamaAsyncResult:
+		await frames.process_frame
+		revoked = true
+		return NakamaAsyncResult.new()
+
+	func delete_account_async(session: NakamaSession) -> NakamaAsyncResult:
+		await frames.process_frame
+		if revoked:
+			return NakamaAsyncResult.new(NakamaException.new("Revoked", 401))
+		deleted_users.append(session.user_id)
+		return NakamaAsyncResult.new()
 
 	func session_refresh_async(_session: NakamaSession, _vars = null) -> NakamaSession:
 		refresh_calls += 1
@@ -73,6 +98,9 @@ func check_touch_targets(node: Node, width: int) -> void:
 		check_touch_targets(child, width)
 
 func _initialize() -> void:
+	if not load("res://tests/test_storage.gd").require_isolation():
+		quit(1)
+		return
 	call_deferred("_run")
 
 func _run() -> void:
@@ -147,6 +175,26 @@ func _run() -> void:
 	check(client.rpc_calls == rpc_before + 2, "401 recovery retries the action exactly once")
 	client.rpc_rejections = 2
 	check(not await probe.refresh_state() and probe._session == null, "A second 401 after successful refresh ends the session")
+	# Live-test regressions exercise the same flow as smoke, with disposable
+	# in-memory identities and simulated failures rather than a real saved login.
+	client.session_reply = session_for("disposable-email")
+	client.rpc_failure = true
+	var failures: Array[String] = []
+	var flow: RefCounted = load("res://tests/live_flow.gd").new(probe, func(message: String) -> void: failures.append(message))
+	check(not await flow.run(), "Live test fails cleanly when account bootstrap fails")
+	check(client.deleted_users == ["disposable-email"], "Failed bootstrap still deletes the created disposable account")
+	check(failures.size() == 1 and flow.accounts.is_empty(), "Failed bootstrap stops dependent steps and completes cleanup")
+	client.rpc_failure = false
+	client.session_reply = session_for("disposable-guest")
+	client.email_login_failure = true
+	failures.clear()
+	flow = load("res://tests/live_flow.gd").new(probe, func(message: String) -> void: failures.append(message))
+	await flow.exercise_guest("disposable-test-identity")
+	check(flow.failed and probe._session == null, "Failed linked login returns safely without dereferencing a null session")
+	check(failures == ["SDK linked email login"], "Failed linked login reports the prerequisite failure")
+	client.email_login_failure = false
+	await flow.cleanup()
+	check(client.deleted_users == ["disposable-email", "disposable-guest"] and flow.accounts.is_empty(), "Cleanup reacquires the revoked disposable session and deletes only that identity")
 	probe.free()
 	client.session_reply = session_for("first-player")
 
