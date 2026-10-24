@@ -13,6 +13,11 @@ function buildServer() {
 function godotCheck(env) {
   godotTests(env, ['client_test.gd']);
 }
+function importProject(env) {
+  // A fresh clone has no .godot cache; launching the game before the editor
+  // ever ran leaves the vendored SDK classes unregistered.
+  run(env.GODOT_BIN, ['--headless', '--import', '--path', ROOT], { timeout: 120_000, killSignal: 'SIGKILL' });
+}
 
 function deploy(env, envFile) {
   validate(env, { production: true });
@@ -54,7 +59,7 @@ try {
       switch (command) {
         case 'configure': configure(env); break;
         case 'build': buildServer(); break;
-        case 'up': buildServer(); configure(env); compose(envFile, ['up', '-d', '--wait', '--force-recreate', 'nakama']); break;
+        case 'up': buildServer(); configure(env); importProject(env); compose(envFile, ['up', '-d', '--wait', '--force-recreate', 'nakama']); break;
         case 'down': compose(envFile, ['down']); break;
         case 'logs': compose(envFile, ['logs', '-f', '--tail', '100']); break;
         case 'status': compose(envFile, ['ps']); break;

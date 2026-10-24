@@ -4,6 +4,7 @@ Framework versions are independent of game app versions and player-state schema 
 
 ## Unreleased
 
+- Run a headless Godot import during `up` so freshly cloned games can launch directly. Without an editor pass first, the missing `.godot` cache left the vendored SDK's classes unregistered and direct launches failed with a gray screen.
 - Drive SDD through LLM chat actions with thin `/sdd` adapters for Claude Code/Cursor and the shared Codex skill. Agents handle installation and verification; document each client’s supported entry point.
 - Add a lean repository-local OpenSpec workflow, four behavioral baseline specs, and an exact development-only CLI pin. Normal checks validate specs and archived task completion. Preserve game-owned OpenSpec files through framework updates and exclude them from mobile exports. Older games need the reviewed first-adoption step in the upgrade guide; development tooling now requires Node.js 22.13+ or a newer LTS (24+).
 

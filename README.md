@@ -39,7 +39,7 @@ Before the first `up`, edit `.env`: set `GAME_TITLE`, a stable reverse-domain `B
 | `node tools/manage.mjs framework-update` | Preview compatible framework releases; add `--apply` for an update branch, then `--finish` to validate |
 | `node tools/manage.mjs configure` | Regenerate public client JSON, title and export presets after env changes |
 | `node tools/manage.mjs build` | Install locked npm dependencies, type-check and compile TypeScript |
-| `node tools/manage.mjs up` | Build backend, configure client and start/reload PostgreSQL/Nakama; wait for health |
+| `node tools/manage.mjs up` | Build backend, configure client, import Godot resources and start/reload PostgreSQL/Nakama; wait for health |
 | `node tools/manage.mjs down` | Stop services; keep player data |
 | `node tools/manage.mjs logs` | Follow recent service logs |
 | `node tools/manage.mjs status` | Show services |
