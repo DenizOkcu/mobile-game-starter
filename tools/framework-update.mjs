@@ -22,6 +22,12 @@ function pendingPath(root) { return path.resolve(root, git(root, ['rev-parse', '
 function clean(root) {
   if (git(root, ['status', '--porcelain'])) throw new Error('Commit or stash local changes before starting an update.');
 }
+function isAncestor(root, from, target) {
+  const result = spawnSync('git', ['merge-base', '--is-ancestor', from, target], { cwd: root, encoding: 'utf8' });
+  if (result.status === 0) return true;
+  if (result.status === 1) return false;
+  throw new Error('Unable to compare framework revisions');
+}
 const version = name => /^v(\d+)\.(\d+)\.(\d+)$/.exec(name)?.slice(1).map(Number);
 const compatible = (a, b) => a[0] === b[0] && (a[0] !== 0 || a[1] === b[1]);
 
@@ -68,13 +74,17 @@ export function inspectUpdate({ root = ROOT, repository = REPOSITORY, to, baseli
   const currentVersion = current && version('v' + current);
   if (!to) {
     if (!currentVersion) throw new Error('Legacy baseline: select a reviewed release with --to vX.Y.Z.');
-    to = refs.filter(name => compatible(currentVersion, version(name))).sort((a, b) => {
+    const candidates = refs.filter(name => compatible(currentVersion, version(name))).sort((a, b) => {
       const x = version(a), y = version(b); return y[0] - x[0] || y[1] - x[1] || y[2] - x[2];
-    })[0];
+    });
+    to = candidates.find(name => isAncestor(root, from, revision(root, `${PREFIX}tags/${name}`)));
+    if (!to) return { format: 1, status: 'no-forward-release', from, target: null, release: null,
+      notes: 'No forward compatible release is published for this baseline. It may be an unreleased template snapshot; keep it and retry after a newer release is published.',
+      selected: [], skipped: [], patch: '' };
   }
-  if (!to || !refs.includes(to)) throw new Error('No matching published release. Use --to vX.Y.Z after the maintainer publishes a release tag.');
+  if (!refs.includes(to)) throw new Error('No matching published release. Use --to vX.Y.Z after the maintainer publishes a release tag.');
   const target = revision(root, `${PREFIX}tags/${to}`);
-  git(root, ['merge-base', '--is-ancestor', from, target]);
+  if (!isAncestor(root, from, target)) throw new Error('The selected release is not a forward release from this baseline; refusing a downgrade or unrelated history.');
   const metadata = JSON.parse(git(root, ['show', `${target}:framework.json`]));
   if (metadata.format !== 1 || 'v' + metadata.version !== to) throw new Error('Release tag and framework.json version disagree');
   // Diff with rename detection disabled: each path is classified independently.
@@ -82,10 +92,11 @@ export function inspectUpdate({ root = ROOT, repository = REPOSITORY, to, baseli
   const skipped = files.filter(preserved), selected = files.filter(file => !preserved(file));
   const patch = selected.length ? git(root, ['diff', '--binary', '--full-index', '--no-renames', '--no-ext-diff', '--no-textconv', from, target, '--', ...selected]) + '\n' : '';
   const notes = git(root, ['show', `${target}:CHANGELOG.md`]);
-  return { format: 1, from, target, release: to, notes, selected, skipped, patch };
+  return { format: 1, status: from === target ? 'current' : 'update', from, target, release: to, notes, selected, skipped, patch };
 }
 
 export function applyUpdate(plan, { root = ROOT } = {}) {
+  if (plan.status === 'no-forward-release') return console.log(plan.notes);
   clean(root);
   const pending = pendingPath(root);
   if (fs.existsSync(pending)) throw new Error('An update is already pending; resolve and finish it first.');
@@ -94,10 +105,35 @@ export function applyUpdate(plan, { root = ROOT } = {}) {
   const branch = `codex/framework-${plan.release}-${plan.target.slice(0, 8)}`;
   git(root, ['switch', '-c', branch]);
   const { patch, ...state } = plan;
-  write(pending, { ...state, branch, original });
-  fs.writeFileSync(path.join(root, 'framework-update-report.md'), `# Framework update to ${plan.release}\n\nFrom: ${plan.from}\nTarget: ${plan.target}\n\n## Apply and review\n\n${plan.selected.map(file => '- ' + file).join('\n') || 'No automatic file changes.'}\n\n## Preserved; review for interface or migration changes\n\n${plan.skipped.map(file => '- ' + file).join('\n') || 'None.'}\n\nReview release notes, configuration additions, client compatibility and migrations. Resolve conflicts, stage resolutions, then run \`node tools/manage.mjs framework-update --finish\`. Baseline remains unchanged until validation succeeds. No deployment is performed.\n`);
-  if (patch) git(root, ['apply', '--3way', '--index', '--whitespace=nowarn', '-'], { input: patch });
+  const pendingState = { ...state, branch, original, application: 'applying' };
+  write(pending, pendingState);
+  fs.writeFileSync(path.join(root, 'framework-update-report.md'), `# Framework update to ${plan.release}\n\nFrom: ${plan.from}\nTarget: ${plan.target}\n\n## Apply and review\n\n${plan.selected.map(file => '- ' + file).join('\n') || 'No automatic file changes.'}\n\n## Preserved; review for interface or migration changes\n\n${plan.skipped.map(file => '- ' + file).join('\n') || 'None.'}\n\nReview release notes, configuration additions, client compatibility and migrations. Resolve conflicts and stage resolutions. If application failed or was interrupted, review every selected path and record the resolution with \`node tools/manage.mjs framework-update --resolve REASON\` before finishing. Then run \`node tools/manage.mjs framework-update --finish\`. Baseline remains unchanged until validation succeeds. No deployment is performed.\n`);
+  try {
+    if (patch) git(root, ['apply', '--3way', '--index', '--whitespace=nowarn', '-'], { input: patch });
+    pendingState.application = 'applied';
+  } catch (error) {
+    pendingState.application = 'failed';
+    write(pending, pendingState);
+    throw error;
+  }
+  write(pending, pendingState);
   console.log(`Applied on ${branch}. Review framework-update-report.md, then run framework-update --finish.`);
+}
+
+export function resolveUpdate({ root = ROOT, reason } = {}) {
+  const file = pendingPath(root);
+  if (!fs.existsSync(file)) throw new Error('No pending framework update.');
+  const state = json(file);
+  if (state.format !== 1 || git(root, ['branch', '--show-current']) !== state.branch) throw new Error('Switch back to the pending update branch.');
+  if (git(root, ['diff', '--name-only', '--diff-filter=U'])) throw new Error('Resolve and stage conflicts before recording a resolution.');
+  if (state.application === 'applied') throw new Error('The patch applied successfully; review it and run --finish.');
+  if (typeof reason !== 'string' || reason.trim().length < 12 || reason.length > 4000) throw new Error('Provide a resolution reason (12-4000 characters), including manually applied changes or paths intentionally retained.');
+  state.resolution = { reason: reason.trim(), reviewed_paths: state.selected };
+  // Persist the report first so a failed report write cannot unlock completion.
+  fs.appendFileSync(path.join(root, 'framework-update-report.md'), `\n## Manual application resolution\n\n${state.resolution.reason}\n`);
+  state.application = 'reviewed';
+  write(file, state);
+  console.log('Manual resolution recorded. Run --finish to validate before advancing the baseline.');
 }
 
 export function finishUpdate({ root = ROOT, validate = defaultValidation } = {}) {
@@ -106,9 +142,10 @@ export function finishUpdate({ root = ROOT, validate = defaultValidation } = {})
   const state = json(file);
   if (state.format !== 1 || git(root, ['branch', '--show-current']) !== state.branch) throw new Error('Switch back to the pending update branch.');
   if (git(root, ['diff', '--name-only', '--diff-filter=U'])) throw new Error('Resolve and stage conflicts before finishing.');
+  if (!['applied', 'reviewed'].includes(state.application)) throw new Error('Patch application did not complete. Review all selected paths, manually apply missing changes or document retained paths, then run --resolve REASON before --finish.');
   git(root, ['diff', '--check']); git(root, ['diff', '--cached', '--check']);
   validate(root);
-  write(path.join(root, LOCK), { format: 1, repository: REPOSITORY, source_revision: state.target, release: state.release, preserved_paths: state.skipped });
+  write(path.join(root, LOCK), { format: 1, repository: REPOSITORY, source_revision: state.target, release: state.release, preserved_paths: state.skipped, manual_resolution: state.resolution });
   fs.unlinkSync(file);
   console.log('Validation passed; framework.lock.json updated. Review and commit the update branch. Device checks and deployment remain separate.');
 }
@@ -125,8 +162,9 @@ function defaultValidation(root) {
   }
 }
 export function frameworkUpdate(args, { root = ROOT } = {}) {
-  if (args.includes('--help')) return console.log('Usage: node tools/manage.mjs framework-update [--to vX.Y.Z] [--baseline FULL_SHA] [--apply] | --finish\nDefault: fetch release metadata and preview; no game files change.');
+  if (args.includes('--help')) return console.log('Usage: node tools/manage.mjs framework-update [--to vX.Y.Z] [--baseline FULL_SHA] [--apply] | --resolve REASON | --finish\nDefault: fetch release metadata and preview; no game files change.');
   if (args.length === 1 && args[0] === '--finish') return finishUpdate({ root });
+  if (args.length === 2 && args[0] === '--resolve') return resolveUpdate({ root, reason: args[1] });
   let to, baseline, apply = false;
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--apply' && !apply) apply = true;
@@ -135,6 +173,7 @@ export function frameworkUpdate(args, { root = ROOT } = {}) {
     else throw new Error('Unknown update option; run framework-update --help.');
   }
   const plan = inspectUpdate({ root, to, baseline });
+  if (plan.status === 'no-forward-release') return console.log(`Baseline: ${plan.from}\n${plan.notes}`);
   console.log(`Framework update: ${plan.release}\nBaseline: ${plan.from}\nTarget: ${plan.target}\n\nRelease notes\n${plan.notes}\n\nApply and review\n${plan.selected.join('\n') || '(none)'}\n\nPreserved; review for required adaptations\n${plan.skipped.join('\n') || '(none)'}`);
   if (apply) applyUpdate(plan, { root });
 }

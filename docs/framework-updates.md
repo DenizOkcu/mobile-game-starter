@@ -16,7 +16,7 @@ node tools/manage.mjs framework-update
 
 This fetches the official framework's main history and release tags into `refs/mobile-framework/`, without changing remotes, local tags, game files, or branches. It reports the exact baseline and target revisions, release notes, selected paths and preserved paths. Preview needs network access; it is read-only with respect to the game files, but downloads Git objects and updates these dedicated refs.
 
-The default selects the highest stable release in the baseline's major version. Before 1.0, it stays in the same minor version. This is a selection rule, not proof of compatibility with your game. Read the release notes. To select another reviewed release, use `--to vX.Y.Z`.
+The default selects the highest stable release in the baseline's major version. Before 1.0, it stays in the same minor version. This is a selection rule, not proof of compatibility with your game. Read the release notes. To select another reviewed release, use `--to vX.Y.Z`. Only releases descended from the recorded baseline are eligible. If your game came from an untagged main snapshot newer than available tags, preview reports “no forward compatible release” and leaves the game untouched. Retry after a forward release is published; do not relabel the baseline or select an older tag to make the preview succeed. Explicit downgrade or unrelated-history requests are rejected with an explanation.
 
 `init` records the initial repository tree offline in `framework.lock.json`. Commit that file with your game. During the first update, the tool matches the initial snapshot against upstream history. After a completed update it records the exact source revision. It works with GitHub template repositories despite their independent Git histories.
 
@@ -38,6 +38,15 @@ Gameplay under `client/game/`, artwork under `assets/`, private env files, signi
 
 A conflict leaves the branch and Git conflict markers available. Resolve them in favor of the intended game behavior, then stage the resolutions. The baseline remains unchanged. A failed patch may also require manually applying missing changes from the reported revision range; inspect the entire diff rather than assuming all non-conflicting hunks were applied.
 
+Application success/failure is recorded independently of Git conflicts. A fatal patch error can leave no conflict entries, so an empty conflict list is not proof the patch applied. After any failed or interrupted application, review **every selected path**, manually integrate missing changes, and explicitly record the resolution before finishing:
+
+```sh
+node tools/manage.mjs framework-update --resolve "Integrated all selected changes; retained docs/custom-guide.md intentionally because ..."
+node tools/manage.mjs framework-update --finish
+```
+
+Use an actual explanation of the paths integrated or intentionally retained. `--resolve` never reapplies code, clears conflicts, or bypasses tests. It requires staged conflict resolution and adds the reason to the report, pending state and eventual lockfile. Normal successful applications do not need it. Pending updates created by older tooling, which have no application status, also require this review. Do not edit the lockfile or pending JSON to bypass the gate.
+
 Review changes to `.env.example` and add required settings through configuration tooling without printing, replacing or regenerating existing secrets. Preserve Compose project names, bundle IDs, app version, domains and deployment paths. Review `tools/export_presets.template`, then regenerate export presets. Retain game-specific server fields and RPCs. Use explicit, version-checked migrations when a release requires them; never reset saves. Test existing mobile-client compatibility before backend deployment.
 
 ## Validate and finish
@@ -46,7 +55,7 @@ Review changes to `.env.example` and add required settings through configuration
 node tools/manage.mjs framework-update --finish
 ```
 
-Finish requires the pending branch and resolved conflicts. It runs `check`, `up`, and `smoke` against the game's local `.env`. This builds code, starts/restarts local services and uses disposable test accounts. It does not select production settings and rejects an API URL that is not HTTP loopback on the configured local API port. Confirm `.env` points to a disposable local stack before running it. Never point smoke tests at real player saves.
+Finish requires the pending branch, resolved conflicts, and either successful application or an explicitly recorded manual resolution. It runs `check`, `up`, and `smoke` against the game's local `.env`. This builds code, starts/restarts local services and uses disposable test accounts. It does not select production settings and rejects an API URL that is not HTTP loopback on the configured local API port. Confirm `.env` points to a disposable local stack before running it. Never point smoke tests at real player saves.
 
 On failure, fix the issue and rerun `--finish`; the baseline is unchanged. On success, the tool advances `framework.lock.json` and clears the pending state. The lock records paths deliberately preserved from upstream; it means the release was integrated with those exceptions, not that every game file equals the framework. Review and commit all intended changes, including generated tracked settings, the report and lockfile. Test the game's own loop, small-screen layout and affected device exports separately. Deployment requires its own request and backup/recovery plan.
 

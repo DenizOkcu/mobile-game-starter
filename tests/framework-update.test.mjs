@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { inspectUpdate, applyUpdate, finishUpdate, recordFrameworkBaseline } from '../tools/framework-update.mjs';
+import { inspectUpdate, applyUpdate, finishUpdate, resolveUpdate, recordFrameworkBaseline } from '../tools/framework-update.mjs';
 
 function git(root, ...args) {
   const r = spawnSync('git', args, { cwd: root, encoding: 'utf8', env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1', GIT_AUTHOR_NAME: 'Fixture', GIT_AUTHOR_EMAIL: 'fixture@example.invalid', GIT_COMMITTER_NAME: 'Fixture', GIT_COMMITTER_EMAIL: 'fixture@example.invalid' } });
@@ -106,7 +106,7 @@ test('a second release applies only its delta and rejects a downgrade', t => {
   assert.equal(plan.from, f.target); assert.equal(plan.target, next);
   assert.deepEqual(plan.selected, ['server/src/main.ts']);
   applyUpdate(plan, f); finishUpdate({ root: f.root, validate: () => {} }); commit(f.root);
-  assert.throws(() => inspectUpdate({ root: f.root, repository: f.upstream, to: 'v0.1.0' }), /merge-base failed/);
+  assert.throws(() => inspectUpdate({ root: f.root, repository: f.upstream, to: 'v0.1.0' }), /not a forward release/);
 });
 test('binary updates work and renames cannot overwrite preserved game paths', t => {
   const f = fixture(t);
@@ -118,4 +118,77 @@ test('binary updates work and renames cannot overwrite preserved game paths', t 
   applyUpdate(plan, f);
   assert.deepEqual(fs.readFileSync(path.join(f.root, 'addons/test.bin')), Buffer.from([0, 2, 3, 4]));
   assert.equal(fs.existsSync(path.join(f.root, 'client/game/renamed.ts')), false);
+});
+
+test('failed application without conflict entries cannot advance the baseline until explicitly resolved', t => {
+  const f = fixture(t);
+  fs.unlinkSync(path.join(f.root, '.env.example')); commit(f.root);
+  const plan = inspectUpdate({ root: f.root, repository: f.upstream });
+  const lock = path.join(f.root, 'framework.lock.json'), before = fs.readFileSync(lock, 'utf8');
+  assert.throws(() => applyUpdate(plan, f), /git apply failed/);
+  assert.equal(git(f.root, 'diff', '--name-only', '--diff-filter=U'), '');
+  assert.throws(() => finishUpdate({ root: f.root, validate: () => assert.fail('must not validate a failed application') }), /application did not complete/);
+  assert.equal(fs.readFileSync(lock, 'utf8'), before);
+  assert.throws(() => resolveUpdate({ root: f.root, reason: 'fixed' }), /resolution reason/);
+  // Resolve manually rather than blindly retrying a possibly partial patch.
+  for (const file of plan.selected) put(f.root, file, fs.readFileSync(path.join(f.upstream, file)));
+  git(f.root, 'add', '.');
+  const reason = 'Manually integrated every selected path and restored the new .env.example; retained game-specific gameplay.';
+  resolveUpdate({ root: f.root, reason });
+  assert.equal(fs.readFileSync(lock, 'utf8'), before);
+  assert.throws(() => finishUpdate({ root: f.root, validate: () => { throw new Error('smoke failed'); } }), /smoke failed/);
+  assert.equal(fs.readFileSync(lock, 'utf8'), before);
+  finishUpdate({ root: f.root, validate: () => {} });
+  const after = JSON.parse(fs.readFileSync(lock));
+  assert.equal(after.source_revision, f.target);
+  assert.equal(after.manual_resolution.reason, reason);
+  assert.deepEqual(after.manual_resolution.reviewed_paths, plan.selected);
+  assert.match(fs.readFileSync(path.join(f.root, 'framework-update-report.md'), 'utf8'), /Manually integrated every selected path/);
+});
+
+test('resolved Git conflicts still require a recorded application resolution', t => {
+  const f = fixture(t); put(f.root, 'server/src/main.ts', 'custom server state\n'); commit(f.root);
+  put(f.upstream, 'server/src/main.ts', 'upstream server state\n'); put(f.upstream, 'framework.json', '{"format":1,"version":"0.1.2"}'); commit(f.upstream); git(f.upstream, 'tag', 'v0.1.2');
+  assert.throws(() => applyUpdate(inspectUpdate({ root: f.root, repository: f.upstream }), f));
+  assert.throws(() => resolveUpdate({ root: f.root, reason: 'Integrated all selected files preserving custom state.' }), /Resolve and stage/);
+  put(f.root, 'server/src/main.ts', 'merged server state\n'); git(f.root, 'add', '.');
+  assert.throws(() => finishUpdate({ root: f.root, validate: () => assert.fail('resolution required') }), /application did not complete/);
+  resolveUpdate({ root: f.root, reason: 'Merged the server state conflict and reviewed every selected path.' });
+  finishUpdate({ root: f.root, validate: () => {} });
+});
+
+test('an interrupted or legacy application cannot be mistaken for a successful patch', t => {
+  const f = fixture(t); applyUpdate(inspectUpdate({ root: f.root, repository: f.upstream }), f);
+  const pending = path.resolve(f.root, git(f.root, 'rev-parse', '--git-path', 'framework-update.pending.json'));
+  const state = JSON.parse(fs.readFileSync(pending));
+  for (const application of ['applying', undefined]) {
+    state.application = application; fs.writeFileSync(pending, JSON.stringify(state));
+    assert.throws(() => finishUpdate({ root: f.root, validate: () => assert.fail('must review incomplete application') }), /application did not complete/);
+  }
+  resolveUpdate({ root: f.root, reason: 'Reviewed all previously applied paths after the interrupted update.' });
+  finishUpdate({ root: f.root, validate: () => {} });
+});
+
+test('a template from unreleased main gets a harmless preview and can update after the next release', t => {
+  const f = fixture(t); put(f.upstream, 'new-guide.md', 'Unreleased documentation'); const baseline = commit(f.upstream);
+  const root = path.join(path.dirname(f.root), 'fresh'); fs.mkdirSync(root);
+  for (const file of git(f.upstream, 'ls-files').split('\n')) put(root, file, fs.readFileSync(path.join(f.upstream, file)));
+  git(root, 'init', '-b', 'main'); const head = commit(root);
+  const plan = inspectUpdate({ root, repository: f.upstream });
+  assert.equal(plan.status, 'no-forward-release'); assert.equal(plan.from, baseline); assert.equal(plan.target, null);
+  applyUpdate(plan, { root });
+  assert.equal(git(root, 'rev-parse', 'HEAD'), head); assert.equal(git(root, 'branch', '--show-current'), 'main'); assert.equal(git(root, 'status', '--porcelain'), '');
+  assert.throws(() => inspectUpdate({ root, repository: f.upstream, to: 'v0.1.1' }), /not a forward release/);
+  put(f.upstream, 'framework.json', '{"format":1,"version":"0.1.2"}'); const target = commit(f.upstream); git(f.upstream, 'tag', 'v0.1.2');
+  const forward = inspectUpdate({ root, repository: f.upstream });
+  assert.equal(forward.status, 'update'); assert.equal(forward.from, baseline); assert.equal(forward.target, target);
+  applyUpdate(forward, { root }); finishUpdate({ root, validate: () => {} });
+  assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'framework.lock.json'))).source_revision, target);
+});
+
+test('a baseline with no published tags produces a no-forward-release preview', t => {
+  const f = fixture(t); git(f.upstream, 'tag', '-d', 'v0.1.0', 'v0.1.1');
+  const plan = inspectUpdate({ root: f.root, repository: f.upstream });
+  assert.equal(plan.status, 'no-forward-release'); assert.equal(plan.target, null);
+  assert.throws(() => inspectUpdate({ root: f.root, repository: f.upstream, to: 'v0.1.1' }), /No matching published release/);
 });
