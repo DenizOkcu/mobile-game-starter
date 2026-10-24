@@ -63,13 +63,12 @@ func _accept(reply: NakamaSession, reset_state: bool = false) -> bool:
 		state_changed.emit()
 	return true
 
-func _refresh_session() -> bool:
+func _refresh_session() -> NakamaSession:
 	var reply := await _client.session_refresh_async(_session)
 	if not _accept(reply):
 		if reply.get_exception().status_code in [401, 403, 404]:
 			clear_session()
-		return false
-	return true
+	return reply
 
 func restore() -> bool:
 	if _client == null:
@@ -84,7 +83,7 @@ func restore() -> bool:
 	state_ready = false
 	_session = NakamaSession.new(null, false, refresh_token)
 	state_changed.emit()
-	if not await _refresh_session():
+	if (await _refresh_session()).is_exception():
 		return false
 	return await refresh_state()
 
@@ -101,7 +100,7 @@ func recover_session() -> bool:
 		if not _session.token.is_empty():
 			return await refresh_state()
 		if not _session.refresh_token.is_empty():
-			if not await _refresh_session():
+			if (await _refresh_session()).is_exception():
 				return false
 			return await refresh_state()
 	return await restore()
@@ -128,13 +127,19 @@ func authenticate(email: String = "", password: String = "", create: bool = fals
 func _authorized(action: Callable) -> NakamaAsyncResult:
 	if _client == null or _session == null:
 		return NakamaAsyncResult.new(NakamaException.new("Log in to continue.", 401))
-	if _session.would_expire_in(60) and not await _refresh_session():
-		return NakamaAsyncResult.new(NakamaException.new(last_error, 401))
+	if _session.would_expire_in(60):
+		var refreshed := await _refresh_session()
+		if refreshed.is_exception():
+			return refreshed
 	var reply: NakamaAsyncResult = await action.call()
 	if reply.is_exception() and reply.get_exception().status_code == 401:
 		# A definite rejection may be retried once after refresh, never a timeout.
-		if await _refresh_session():
-			reply = await action.call()
+		var refreshed := await _refresh_session()
+		if refreshed.is_exception():
+			# Preserve the refresh error and recoverable credentials. Only the
+			# refresh response itself can definitively reject those credentials.
+			return refreshed
+		reply = await action.call()
 		if reply.is_exception() and reply.get_exception().status_code == 401:
 			clear_session()
 	return reply
@@ -177,5 +182,8 @@ func clear_session() -> void:
 	_session = null
 	state = {}
 	state_ready = false
-	DirAccess.remove_absolute(SESSION_PATH)
+	_clear_persisted_session()
 	state_changed.emit()
+
+func _clear_persisted_session() -> void:
+	DirAccess.remove_absolute(SESSION_PATH)

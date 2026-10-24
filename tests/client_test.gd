@@ -10,6 +10,9 @@ class TestClient extends NakamaClient:
 	var rpc_calls: int = 0
 	var refresh_calls: int = 0
 	var refresh_failure: bool = false
+	var refresh_failure_status: int = 0
+	var rpc_rejections: int = 0
+
 
 	func _init(adapter: NakamaHTTPAdapter, tree: SceneTree) -> void:
 		super(adapter, "test", "http", "127.0.0.1", 7350, 15)
@@ -23,12 +26,15 @@ class TestClient extends NakamaClient:
 		refresh_calls += 1
 		await frames.process_frame
 		if refresh_failure:
-			return NakamaSession.new(null, false, null, NakamaException.new("Simulated refresh timeout", 0))
+			return NakamaSession.new(null, false, null, NakamaException.new("Simulated refresh failure", refresh_failure_status))
 		return session_reply
 
 	func rpc_async(_session: NakamaSession, _id: String, _payload = null):
 		rpc_calls += 1
 		await frames.process_frame
+		if rpc_rejections > 0:
+			rpc_rejections -= 1
+			return NakamaAPI.ApiRpc.new(NakamaException.new("Simulated access rejection", 401))
 		if rpc_failure:
 			return NakamaAPI.ApiRpc.new(NakamaException.new("Simulated timeout", 0))
 		return NakamaAPI.ApiRpc.create(NakamaAPI, {"payload": JSON.stringify({"state": snapshot})})
@@ -40,8 +46,8 @@ func check(condition: bool, message: String) -> void:
 		failed = true
 		printerr("FAIL: " + message)
 
-func session_for(user_id: String) -> NakamaSession:
-	var payload := Marshalls.utf8_to_base64(JSON.stringify({"uid": user_id, "exp": int(Time.get_unix_time_from_system()) + 3600}))
+func session_for(user_id: String, lifetime: int = 3600) -> NakamaSession:
+	var payload := Marshalls.utf8_to_base64(JSON.stringify({"uid": user_id, "exp": int(Time.get_unix_time_from_system()) + lifetime}))
 	var token := "test." + payload + ".signature"
 	return NakamaSession.new(token, false, token)
 
@@ -109,6 +115,38 @@ func _run() -> void:
 	client.refresh_failure = false
 	check(await probe.recover_session() and probe.state_ready, "Refresh-only recovery succeeds when connectivity returns")
 	check(client.refresh_calls == refresh_before + 2 and probe._session.user_id == "recovering-player", "Recovery retries the existing account instead of creating a guest")
+	# A rejected access token followed by a refresh outage must not delete
+	# credentials or replay the original action. The probe suppresses file IO.
+	probe._session = session_for("recovering-player")
+	client.rpc_rejections = 1
+	client.refresh_failure = true
+	var clears_before: int = probe.clear_calls
+	rpc_before = client.rpc_calls
+	check(not await probe.refresh_state(), "A 401 followed by a refresh outage fails the request")
+	check(probe.clear_calls == clears_before and probe.has_recoverable_session(), "Refresh network failure retains recoverable credentials")
+	check(client.rpc_calls == rpc_before + 1, "An action is not replayed after a failed refresh")
+	check(probe.last_error == "Connection lost or timed out. Refresh before trying again.", "The refresh network error replaces the original 401")
+	client.refresh_failure = false
+	check(await probe.recover_session(), "Connectivity recovery still uses the saved account")
+
+	probe._session = session_for("recovering-player", -1)
+	client.refresh_failure = true
+	rpc_before = client.rpc_calls
+	check(not await probe.refresh_state(), "Expired access token reports a refresh outage")
+	check(probe.clear_calls == clears_before and client.rpc_calls == rpc_before, "Proactive refresh failure neither clears credentials nor sends the action")
+	client.refresh_failure_status = 401
+	check(not await probe.recover_session() and probe._session == null and not probe.state_ready, "Definitively rejected refresh credentials clear the session")
+	check(probe.clear_calls == clears_before + 1, "Definitive refresh rejection clears persisted credentials once")
+
+	client.refresh_failure = false
+	client.refresh_failure_status = 0
+	probe._session = session_for("recovering-player")
+	client.rpc_rejections = 1
+	rpc_before = client.rpc_calls
+	check(await probe.refresh_state(), "Successful refresh permits one retry of a definitively rejected action")
+	check(client.rpc_calls == rpc_before + 2, "401 recovery retries the action exactly once")
+	client.rpc_rejections = 2
+	check(not await probe.refresh_state() and probe._session == null, "A second 401 after successful refresh ends the session")
 	probe.free()
 	client.session_reply = session_for("first-player")
 
