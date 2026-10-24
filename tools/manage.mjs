@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { frameworkUpdate, recordFrameworkBaseline } from './framework-update.mjs';
 import { ROOT, readEnv, validate, init, configure, run, compose, serverEnvironment, parseArgs, redact } from './lib.mjs';
 
 function buildServer() {
@@ -41,41 +42,46 @@ function deploy(env, envFile) {
 }
 
 try {
-  const parsed = parseArgs(process.argv.slice(2), ['init', 'configure', 'build', 'up', 'down', 'logs', 'status', 'check', 'smoke', 'deploy', 'backup']);
-  if (parsed.help) process.exit(0);
-  const { envFile, command } = parsed;
-  if (command === 'init') { init(envFile); configure(readEnv(envFile)); }
-  else {
-    if (!fs.existsSync(envFile)) throw new Error('Run node tools/manage.mjs init first');
-    const env = readEnv(envFile); validate(env);
-    switch (command) {
-      case 'configure': configure(env); break;
-      case 'build': buildServer(); break;
-      case 'up': buildServer(); configure(env); compose(envFile, ['up', '-d', '--wait', '--force-recreate', 'nakama']); break;
-      case 'down': compose(envFile, ['down']); break;
-      case 'logs': compose(envFile, ['logs', '-f', '--tail', '100']); break;
-      case 'status': compose(envFile, ['ps']); break;
-      case 'check':
-        buildServer(); configure(env);
-        run(process.execPath, ['--test', path.join(ROOT, 'tests/tooling.test.mjs')]);
-        compose(envFile, ['config', '--quiet']); compose(envFile, ['config', '--quiet'], { production: true });
-        run('bash', ['-n', path.join(ROOT, 'infra/deploy-remote.sh')]); godotCheck(env); break;
-      case 'smoke': {
-        configure(env); run(process.execPath, [path.join(ROOT, 'tests/integration.mjs'), envFile]);
-        const result = run(env.GODOT_BIN, ['--headless', '--path', ROOT, '--script', 'res://tests/live_client.gd'], { capture: true, check: false });
-        const output = redact(result.stdout + result.stderr, env); console.log(output);
-        if (result.status !== 0 || output.includes('ERROR:')) throw new Error('Live Godot transport check failed');
-        break;
-      }
-      case 'deploy': deploy(env, envFile); break;
-      case 'backup': {
-        const folder = path.join(ROOT, 'backups'); fs.mkdirSync(folder, { recursive: true });
-        const backup = path.join(folder, `${new Date().toISOString().replace(/[:.]/g, '-')}.sql`);
-        const fd = fs.openSync(backup, 'wx', 0o600);
-        try { compose(envFile, ['exec', '-T', 'postgres', 'pg_dump', '-U', 'nakama', '-d', 'nakama'], { stdio: ['ignore', fd, 'inherit'] }); }
-        catch (error) { fs.unlinkSync(backup); throw error; }
-        finally { fs.closeSync(fd); }
-        console.log(`Saved ${backup}`); break;
+  if (process.argv[2] === 'framework-update') {
+    frameworkUpdate(process.argv.slice(3));
+  } else {
+    const parsed = parseArgs(process.argv.slice(2), ['init', 'configure', 'build', 'up', 'down', 'logs', 'status', 'check', 'smoke', 'deploy', 'backup', 'framework-update']);
+    if (parsed.help) process.exit(0);
+    const { envFile, command } = parsed;
+    if (command === 'framework-update') throw new Error('Place framework-update immediately after manage.mjs; validation uses local .env.');
+    if (command === 'init') { init(envFile); recordFrameworkBaseline(); configure(readEnv(envFile)); }
+    else {
+      if (!fs.existsSync(envFile)) throw new Error('Run node tools/manage.mjs init first');
+      const env = readEnv(envFile); validate(env);
+      switch (command) {
+        case 'configure': configure(env); break;
+        case 'build': buildServer(); break;
+        case 'up': buildServer(); configure(env); compose(envFile, ['up', '-d', '--wait', '--force-recreate', 'nakama']); break;
+        case 'down': compose(envFile, ['down']); break;
+        case 'logs': compose(envFile, ['logs', '-f', '--tail', '100']); break;
+        case 'status': compose(envFile, ['ps']); break;
+        case 'check':
+          buildServer(); configure(env);
+          run(process.execPath, ['--test', path.join(ROOT, 'tests/tooling.test.mjs'), path.join(ROOT, 'tests/framework-update.test.mjs')]);
+          compose(envFile, ['config', '--quiet']); compose(envFile, ['config', '--quiet'], { production: true });
+          run('bash', ['-n', path.join(ROOT, 'infra/deploy-remote.sh')]); godotCheck(env); break;
+        case 'smoke': {
+          configure(env); run(process.execPath, [path.join(ROOT, 'tests/integration.mjs'), envFile]);
+          const result = run(env.GODOT_BIN, ['--headless', '--path', ROOT, '--script', 'res://tests/live_client.gd'], { capture: true, check: false });
+          const output = redact(result.stdout + result.stderr, env); console.log(output);
+          if (result.status !== 0 || output.includes('ERROR:')) throw new Error('Live Godot transport check failed');
+          break;
+        }
+        case 'deploy': deploy(env, envFile); break;
+        case 'backup': {
+          const folder = path.join(ROOT, 'backups'); fs.mkdirSync(folder, { recursive: true });
+          const backup = path.join(folder, `${new Date().toISOString().replace(/[:.]/g, '-')}.sql`);
+          const fd = fs.openSync(backup, 'wx', 0o600);
+          try { compose(envFile, ['exec', '-T', 'postgres', 'pg_dump', '-U', 'nakama', '-d', 'nakama'], { stdio: ['ignore', fd, 'inherit'] }); }
+          catch (error) { fs.unlinkSync(backup); throw error; }
+          finally { fs.closeSync(fd); }
+          console.log(`Saved ${backup}`); break;
+        }
       }
     }
   }

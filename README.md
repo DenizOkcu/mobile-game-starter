@@ -10,7 +10,7 @@ The kit includes guest access, email registration and login, guest-to-email link
 
 On [Mobile Game Starter](https://github.com/DenizOkcu/mobile-game-starter), select **Use this template → Create a new repository**. Clone your new repository and run the commands below from its root. GitHub creates an independent history; keep the new repository's `.git` directory and do not run `git init` again. The default branch is enough.
 
-Each game keeps the repository-local setup skills and `.env.example`. Run `init` in the new clone to generate fresh secrets; never copy another game's private env files or setup notes. Template updates do not automatically update games created from it.
+Each game keeps the repository-local setup skills and `.env.example`. Run `init` in the new clone to generate fresh secrets; never copy another game's private env files or setup notes. Template updates do not automatically update games created from it. For an existing game, ask your assistant to use `mobile-framework-update`, or run `node tools/manage.mjs framework-update` for a preview. See the [upgrade guide](docs/framework-updates.md).
 
 ## Guided setup with an LLM
 
@@ -36,6 +36,7 @@ Before the first `up`, edit `.env`: set `GAME_TITLE`, a stable reverse-domain `B
 
 | Command | Purpose |
 | --- | --- |
+| `node tools/manage.mjs framework-update` | Preview compatible framework releases; add `--apply` for an update branch, then `--finish` to validate |
 | `node tools/manage.mjs configure` | Regenerate public client JSON, title and export presets after env changes |
 | `node tools/manage.mjs build` | Install locked npm dependencies, type-check and compile TypeScript |
 | `node tools/manage.mjs up` | Build backend, configure client and start/reload PostgreSQL/Nakama; wait for health |

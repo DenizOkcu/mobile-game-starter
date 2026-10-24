@@ -16,6 +16,10 @@ Interview a few questions at a time, reuse existing answers, verify prerequisite
 
 For every new visible game-art or UI-art task, read and invoke the available **imagegen** skill and follow `docs/setup/visual-assets.md`. Generate actual characters/objects/backgrounds, UI skins, icons and splash artwork; do not substitute primitive shapes, procedural drawing, emoji or default-widget-only visuals for the game's art direction. Native layout/controls, readable live text, collision shapes and hit regions remain code. Explicit user requests for geometric/vector/wireframe output override this rule. If imagegen is unavailable, continue non-art work and report the asset milestone blocked; do not silently draw a substitute. Copy selected assets into the repo before referencing them.
 
+## Updating games from the template
+
+For framework updates, use `.agents/skills/mobile-framework-update/SKILL.md` and `docs/framework-updates.md`. Preview before applying; preserve game identity, private config, custom gameplay and player state. Record the exact framework baseline only after validation. Updating source does not authorize deployment or publishing.
+
 ## Prefer native Nakama features
 
 Before designing a backend feature, read `docs/nakama-feature-map.md` and use `.agents/skills/nakama-feature-planning/SKILL.md`. Interpret behavior, not just the developer's label: a durable fellowship/guild/coven is usually a Nakama Group; a temporary expedition crew may be a Party; an NPC roster is game state. Ask only about ambiguities that affect the design.

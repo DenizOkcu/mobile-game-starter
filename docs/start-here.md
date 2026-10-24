@@ -6,7 +6,7 @@ Open your new clone in your coding assistant and say:
 
 > Help me get Mobile Game Starter running locally. Use the mobile-local-setup skill, interview me a few questions at a time, check existing tools first, and guide me until the Godot game talks to local Nakama.
 
-The four setup skills live in `.agents/skills/`, so they stay with each new game. If your assistant discovers repository skills, you can ask for `$mobile-local-setup`, `$mobile-production-setup`, `$mobile-android-export`, or `$mobile-ios-export`. Otherwise, tell it to read the matching `SKILL.md` directly. Both methods use the same instructions, without a global install or a path tied to your machine.
+The setup skills live in `.agents/skills/`, so they stay with each new game. If your assistant discovers repository skills, you can ask for `$mobile-local-setup`, `$mobile-production-setup`, `$mobile-android-export`, or `$mobile-ios-export`. Otherwise, tell it to read the matching `SKILL.md` directly. Both methods use the same instructions, without a global install or a path tied to your machine.
 
 | You want to… | Entry point |
 | --- | --- |
@@ -15,6 +15,7 @@ The four setup skills live in `.agents/skills/`, so they stay with each new game
 | Build/install Android | [Android export interview](../.agents/skills/mobile-android-export/SKILL.md) |
 | Build/run iOS in Xcode | [iOS export interview](../.agents/skills/mobile-ios-export/SKILL.md) |
 | Choose native Nakama features for your game | [Feature-planning skill](../.agents/skills/nakama-feature-planning/SKILL.md) and [concept map](nakama-feature-map.md) |
+| Update a game from an older starter | [Framework update skill](../.agents/skills/mobile-framework-update/SKILL.md) and [upgrade guide](framework-updates.md) |
 | Turn an idea into a prototype | [Game prompt](new-game-prompt.md), after local setup works |
 
 The assistant asks a few questions at a time, checks what is installed, and saves progress without secrets under ignored `.setup/`. Say "resume local setup" or "resume the Android interview" to continue. Keep private keys, passwords, account tokens, and keystores out of chat. The assistant will help you set them on your machine.

@@ -27,3 +27,11 @@ Tests of `tools/export.mjs` use a mocked exporter to check process and credentia
 ## Node.js and Bash tooling migration
 
 The project tooling, API smoke checks, and unit tests now use Node.js built-ins without extra runtime packages. Remote deployment runs `infra/deploy-remote.sh` over SSH with strict host-key checking. It reads the env file as data and never sources it. The 12 tooling checks cover parser and credential boundaries, export safety, literal subprocess arguments, Bash deployment behavior, and the local docs preview server. TypeScript compilation, Compose validation, Godot navigation, and API/SDK integration checks passed. Signed mobile builds and production VPS deployment still need separate verification.
+
+## Framework update workflow (24 October 2026)
+
+`check` passed with 19 tests, TypeScript compilation, Compose validation, and Godot import/navigation. Seven update tests use disposable local repositories with unrelated histories to cover baseline detection, compatible release selection, read-only previews, preservation of game changes and credentials, overlapping conflicts, failed-validation recovery, sequential updates, downgrade rejection, binary files and rename boundaries. Finish also rejects remote API endpoints before running its local checks. The new update skill passed the skill validator, and its guide links resolved.
+
+After starting Docker Desktop, `up` and both API/Godot SDK `smoke` checks passed. The local stack remains running; `down` preserves its data. An Android resource-pack export and inspection confirmed that the MIT and SDK licenses and public config are included while framework metadata, tooling and private env files are excluded. The sandboxed export emitted macOS certificate/editor-settings permission diagnostics; pack generation and content checks succeeded. This did not verify an APK, signed build, physical device or production deployment. Android build-tools remain unconfigured.
+
+Release handling was tested against local fixture tags. The initial framework release is version 0.1.0; its matching `v0.1.0` tag identifies the source baseline. Future releases follow the maintainer checklist in `docs/framework-updates.md`.
